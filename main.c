@@ -1,54 +1,70 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <uchar.h>
-#include <stdbool.h>
 
-typedef uint8_t uchar_t;
-
-#include "config.h"
+#include "confi.h"
 
 
 int main()
 {
 	const char * file = "main.conf";
-	struct config_param params[] =
+	unsigned  int params_size = 7;
+	struct confi_param params[] =
 	{
 		{
 			.name = "param_int",
-			.type = CONFIG_PARAM_TYPE_UINT
+			.type = CONFI_TYPE_INT
 		},
 		{
 			.name = "param_double",
-			.type = CONFIG_PARAM_TYPE_DOUBLE
+			.type = CONFI_TYPE_DOUBLE
 		},
 		{
 			.name = "param_string1",
-			.type = CONFIG_PARAM_TYPE_STRING
+			.type = CONFI_TYPE_STRING
 		},
 		{
 			.name = "param_string2",
-			.type = CONFIG_PARAM_TYPE_STRING
+			.type = CONFI_TYPE_STRING
 		},
 		{
 			.name = "param_string3",
-			.type = CONFIG_PARAM_TYPE_STRING
+			.type = CONFI_TYPE_STRING
 		},
 		{
 			.name = "param_boolean1",
-			.type = CONFIG_PARAM_TYPE_BOOLEAN
+			.type = CONFI_TYPE_BOOLEAN
 		},
 		{
 			.name = "param_boolean2",
-			.type = CONFIG_PARAM_TYPE_BOOLEAN
+			.type = CONFI_TYPE_BOOLEAN
 		}
 	};
 
-	int32_t result = config_parse (file, params, 7);
+	int result = confi_parse (file, params, params_size);
 	if (result == -1)
 	{
 		perror ("Ошибка парсинга");
+	}
+
+	for (unsigned int i = 0; i < params_size; i++)
+	{
+		switch (params[i].type)
+		{
+			case CONFI_TYPE_INT:
+				printf ("%s = %d\n", params[i].name, *((int *)params[i].value));
+				break;
+
+			case CONFI_TYPE_DOUBLE:
+				printf ("%s = %lf\n", params[i].name, *((double *)params[i].value));
+				break;
+
+			case CONFI_TYPE_STRING:
+				printf ("%s = %s\n", params[i].name, (char *)params[i].value);
+				break;
+
+			case CONFI_TYPE_BOOLEAN:
+				printf ("%s = %d\n", params[i].name, *((bool *)params[i].value));
+				break;
+		}
 	}
 
     return 0;

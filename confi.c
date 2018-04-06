@@ -1,230 +1,124 @@
-#include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include <uchar.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "confi.h"
 
 
 /* Типы токенов */
 static enum
 {
-	IS_CODE,							/* Код */
-	IS_COMMENT, 						/* Комментарий */
-	IS_PARAM,							/* Наименование параметра */
-	IS_EQUAL,							/* Знак равно */
-	IS_QUOTES_DOUBLE,
-	IS_QUOTES_DOUBLE_SLASH,
-	IS_QUOTES_SINGLE,
-	IS_QUOTES_SINGLE_SLASH,
-	IS_UINT,
-	IS_DOUBLE,
-	IS_BOOLEAN
-} state;
-
-/* Настройки по параметрам */
-static enum
-{
-	PARAM_MAX_SIZE = 12,
-	VALUE_MAX_SIZE = 10
+	TOKEN_CODE,
+	TOKEN_COMMENT,
+	TOKEN_PARAM,
+	TOKEN_EQUAL,
+	TOKEN_VALUE,
+	TOKEN_QUOTES_DOUBLE,
+	TOKEN_QUOTES_DOUBLE_SLASH,
+	TOKEN_QUOTES_SINGLE,
+	TOKEN_QUOTES_SINGLE_SLASH,
+	TOKEN_INT,
+	TOKEN_DOUBLE,
+	TOKEN_BOOLEAN
 };
 
-static uint32_t param_size = 0;
-static uchar_t param[PARAM_MAX_SIZE + 1] = {'\0'};
+int token;
 
-static struct config_param * cparam;
+/* Максимальные и минимальные значения */
+static enum
+{
+	PARAM_MAX_SIZE = 255,
+	VALUE_MAX_SIZE = 1024
+};
 
-static uint32_t value_size = 0;
-static uchar_t value[VALUE_MAX_SIZE] = {'\0'};
+/* Буферы для хранения названия и значения параметров */
+static unsigned int param_size = 0;
+static char param[PARAM_MAX_SIZE + 1] = {'\0'};
+
+static unsigned int value_size = 0;
+static char value[VALUE_MAX_SIZE + 1] = {'\0'};
+
+/* Ссылка на текущий параметр */
+static struct confi_param * cparam;
 
 /**
  * Спарсить файл
  */
-int32_t config_parse (const char * file, struct config_param * params, uint32_t params_size)
+int confi_parse (const char * file, struct confi_param * params, unsigned int params_size)
 {
-	char dir[1024];
-	getcwd (dir, sizeof (dir));
-
-	strcat (dir, "/");
+	/* Текушая папка */
+	char dir[1024] = {'\0'};
+	if (file[0] != '/')
+	{
+		getcwd (dir, sizeof (dir));
+		strcat (dir, "/");
+	}
 	strcat (dir, file);
 
 	/* Открыть файл */
-    FILE * fp = fopen (file, "r");
+    FILE * fp = fopen (dir, "r");
 	if (!fp)
 	{
 		return -1;
 	}
 
 	/* Посимвольный парсинг */
-	uchar_t ch;
+	char ch;
 	while (true)
 	{
-		ch = (uchar_t)fgetc (fp);
+		ch = (char)fgetc (fp);
 		if (feof (fp))
 		{
 			break;
 		}
 
-		switch (state)
+		switch (token)
 		{
 			/* Код */
-			case IS_CODE:
+			case TOKEN_CODE:
 			{
-				if (isblank (ch) || ch == '\n')
-				{
-					continue;
-				}
-				else if (ch == '#')
-				{
-					state = IS_COMMENT;
-				}
-				else if (isalpha (ch) || ch == '-' || ch == '_')
-				{
-					param[0] = ch;
-					param_size++;
-					state = IS_PARAM;
-				}
+				token = _token_code (ch);
 			}
 			break;
 
 			/* Комментарий */
-			case IS_COMMENT:
+			case TOKEN_COMMENT:
 			{
-				if (ch == '\n')
-				{
-					state = IS_CODE;
-				}
+				token = _token_comment (ch);
 			}
 			break;
 
 			/* Название параметра */
-			case IS_PARAM:
+			case TOKEN_PARAM:
 			{
-				if (isalnum (ch) || ch == '-' || ch == '_')
-				{
-					param[param_size] = ch;
-					param_size++;
-					continue;
-				}
-				else
-				{
-					param[param_size] = '\0';
+				token = _token_param (ch);
 
-					if ((cparam = get_config_param (param, params, params_size)) == NULL)
-					{
-						fprintf (stderr, "Неизвестный параметр «%s».", param);
-						return -1;
-					}
-				}
-
-				if (ch == '=')
+				if (token == TOKEN_EQUAL)
 				{
-					state = IS_EQUAL;
+					cparam = _get_param (param, params, params_size);
 				}
-				else if (isblank (ch))
-				{
-					continue;
-				}
-				else
-				{
-					fprintf (stderr, "Ошибка парсинга после параметра «%s».", param);
-					return -1;
-				}
-
 			}
 			break;
 
 			/* Знак равно */
-			case IS_EQUAL:
+			case TOKEN_EQUAL:
 			{
-				if (isblank (ch))
-				{
-					continue;
-				}
-				else
-				{
-					switch (cparam->type)
-					{
-						/* Тип число */
-						case CONFIG_PARAM_TYPE_UINT:
-						{
-							if (isdigit(ch))
-							{
-								state = IS_UINT;
-								value[value_size] = ch;
-								value_size++;
-							}
-							else
-							{
-								fprintf (stderr, "Параметр «%s» не является числом.", param);
-								return -1;
-							}
-						}
-						break;
+				token = _token_equal (ch);
+			}
+			break;
 
-						/* Число с плавающей точкой */
-						case CONFIG_PARAM_TYPE_DOUBLE:
-						{
-							if (isdigit(ch))
-							{
-								state = IS_DOUBLE;
-								value[value_size] = ch;
-								value_size++;
-							}
-							else
-							{
-								fprintf (stderr, "Параметр «%s» не является числом с плавающей точкой.", param);
-								return -1;
-							}
-						}
-						break;
-
-						/* Строка */
-						case CONFIG_PARAM_TYPE_STRING:
-						{
-							if (ch == '"')
-							{
-								state = IS_QUOTES_DOUBLE;
-							}
-							else if (ch == '\'')
-							{
-								state = IS_QUOTES_SINGLE;
-							}
-							else
-							{
-								fprintf (stderr, "Параметр «%s» не является строкой.", param);
-								return -1;
-							}
-						}
-						break;
-
-						/* Булёвое значение */
-						case CONFIG_PARAM_TYPE_BOOLEAN:
-						{
-							if (isalnum (ch))
-							{
-								state = IS_BOOLEAN;
-								value[value_size] = ch;
-								value_size++;
-							}
-							else
-							{
-								fprintf (stderr, "Параметр «%s» не является булёвым значением.", param);
-								return -1;
-							}
-						}
-						break;
-					}
-				}
+			/* Значение */
+			case TOKEN_VALUE:
+			{
+				token = _token_value (ch);
 			}
 			break;
 
 			/* Число */
-			case IS_UINT:
+			case TOKEN_INT:
 			{
 				if (isdigit (ch))
 				{
@@ -236,7 +130,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					value[value_size] = '\0';
 
 					char * end;
-					int value_int = strtol (value, &end, 0);
+					int value_int = (int)strtol (value, &end, 0);
 					if (*end)
 					{
 						fprintf (stderr, "Параметр «%s» не является числом.", param);
@@ -247,7 +141,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					*((int *)cparam->value) = value_int;
 
 //					printf ("Параметр «%s» = «%d».\n", param, *((int *)cparam->value));
-					state = IS_CODE;
+					token = TOKEN_CODE;
 
 					param_size = 0;
 					memset (param, '\0', PARAM_MAX_SIZE);
@@ -263,7 +157,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 			break;
 
 			/* Число с плавающей точкой  */
-			case IS_DOUBLE:
+			case TOKEN_DOUBLE:
 			{
 				if (isdigit (ch) || ch == '.')
 				{
@@ -286,7 +180,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					*((double *)cparam->value) = value_double;
 
 //					printf ("Параметр «%s» = «%f».\n", param, *((double *)cparam->value));
-					state = IS_CODE;
+					token = TOKEN_CODE;
 
 					param_size = 0;
 					memset (param, '\0', PARAM_MAX_SIZE);
@@ -302,7 +196,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 			break;
 
 			/* Двойные кавычки */
-			case IS_QUOTES_DOUBLE:
+			case TOKEN_QUOTES_DOUBLE:
 			{
 				if (ch != '"' && ch != '\\')
 				{
@@ -316,7 +210,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					cparam->value = strdup (value);
 
 //					printf ("Параметр «%s» = «%s».\n", param, (char *)value);
-					state = IS_CODE;
+					token = TOKEN_CODE;
 
 					param_size = 0;
 					memset (param, '\0', PARAM_MAX_SIZE);
@@ -325,21 +219,21 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 				}
 				else if (ch == '\\')
 				{
-					state = IS_QUOTES_DOUBLE_SLASH;
+					token = TOKEN_QUOTES_DOUBLE_SLASH;
 				}
 			}
 			break;
 
-			case IS_QUOTES_DOUBLE_SLASH:
+			case TOKEN_QUOTES_DOUBLE_SLASH:
 			{
 				value[value_size] = ch;
 				value_size++;
-				state = IS_QUOTES_DOUBLE;
+				token = TOKEN_QUOTES_DOUBLE;
 			}
 			break;
 
 			/* Одинарные кавычки */
-			case IS_QUOTES_SINGLE:
+			case TOKEN_QUOTES_SINGLE:
 			{
 				if (ch != '\'' && ch != '\\')
 				{
@@ -353,7 +247,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					cparam->value = strdup (value);
 
 //					printf ("Параметр «%s» = «%s».\n", param, (char *)value);
-					state = IS_CODE;
+					token = TOKEN_CODE;
 
 					param_size = 0;
 					memset (param, '\0', PARAM_MAX_SIZE);
@@ -362,20 +256,20 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 				}
 				else if (ch == '\\')
 				{
-					state = IS_QUOTES_SINGLE_SLASH;
+					token = TOKEN_QUOTES_SINGLE_SLASH;
 				}
 			}
 			break;
 
-			case IS_QUOTES_SINGLE_SLASH:
+			case TOKEN_QUOTES_SINGLE_SLASH:
 			{
 				value[value_size] = ch;
 				value_size++;
-				state = IS_QUOTES_SINGLE;
+				token = TOKEN_QUOTES_SINGLE;
 			}
 			break;
 
-			case IS_BOOLEAN:
+			case TOKEN_BOOLEAN:
 			{
 				if (isalnum (ch))
 				{
@@ -413,7 +307,7 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 					}
 
 //					printf ("Параметр «%s» = «%d».\n", param, *((bool *)cparam->value));
-					state = IS_CODE;
+					token = TOKEN_CODE;
 
 					param_size = 0;
 					memset (param, '\0', PARAM_MAX_SIZE);
@@ -427,11 +321,18 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 				}
 			}
 			break;
+
+			/* Ошибка в парсинге */
+			default:
+			{
+				fprintf (stderr, "Ошибка при парсинге.");
+				return -1;
+			}
 		}
 	}
 
 	/* Файл заканчивается неправильно */
-	if (state != IS_CODE)
+	if (token != TOKEN_CODE)
 	{
 		fprintf (stderr, "Ошибка парсинга");
 		return -1;
@@ -446,9 +347,9 @@ int32_t config_parse (const char * file, struct config_param * params, uint32_t 
 /**
  * Проверить наличие праметра
  */
-static struct config_param * get_config_param (uchar_t * param, struct config_param * params, uint32_t params_size)
+struct confi_param * _get_param (const char * param, struct confi_param * params, unsigned int params_size)
 {
-	for (uint32_t i = 0; i < params_size; i++)
+	for (unsigned int i = 0; i < params_size; i++)
 	{
 		if (strcmp (params[i].name, param) == 0)
 		{
@@ -459,3 +360,185 @@ static struct config_param * get_config_param (uchar_t * param, struct config_pa
 	return NULL;
 }
 
+/**
+ * Токен «код»
+ */
+int _token_code (char ch)
+{
+	if (isblank (ch) || ch == '\n')
+	{
+		return TOKEN_COMMENT;
+	}
+	else if (ch == '#')
+	{
+		return TOKEN_COMMENT;
+	}
+	else if (isalpha (ch) || ch == '_')
+	{
+		return TOKEN_PARAM;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Токен «комментарий»
+ */
+int _token_comment (char ch)
+{
+	if (ch == '\n')
+	{
+		return TOKEN_CODE;
+	}
+}
+
+/**
+ * Токен параметр
+ */
+int _token_param (char ch)
+{
+	if (isalnum (ch) || ch == '-' || ch == '_')
+	{
+		param[param_size] = ch;
+		param_size++;
+
+		return TOKEN_PARAM;
+	}
+	else if (isblank (ch))
+	{
+		return TOKEN_EQUAL;
+	}
+	else
+	{
+		return -1;
+	}
+
+
+//	else
+//	{
+//		param[param_size] = '\0';
+//
+//		if ((cparam = _get_param (param, params, params_size)) == NULL)
+//		{
+//			fprintf (stderr, "Неизвестный параметр «%s».", param);
+//			return -1;
+//		}
+//	}
+//
+//	if (ch == '=')
+//	{
+//		token = TOKEN_EQUAL;
+//	}
+//	else if (isblank (ch))
+//	{
+//		continue;
+//	}
+//	else
+//	{
+//		fprintf (stderr, "Ошибка парсинга после параметра «%s».", param);
+//		return -1;
+//	}
+}
+
+/**
+ * Токен равно
+ */
+int _token_equal (char ch)
+{
+	if (isblank (ch))
+	{
+		return TOKEN_EQUAL;
+	}
+	else if (ch == "=")
+	{
+		return TOKEN_VALUE;
+	}
+
+
+//	else
+//	{
+//		switch (cparam->type)
+//		{
+//			/* Тип число */
+//			case CONFI_TYPE_INT:
+//			{
+//				if (isdigit(ch) || ch == '-')
+//				{
+//					token = TOKEN_INT;
+//					value[value_size] = ch;
+//					value_size++;
+//				}
+//				else
+//				{
+//					fprintf (stderr, "Параметр «%s» не является числом.", param);
+//					return -1;
+//				}
+//			}
+//				break;
+//
+//				/* Число с плавающей точкой */
+//			case CONFI_TYPE_DOUBLE:
+//			{
+//				if (isdigit(ch))
+//				{
+//					token = TOKEN_DOUBLE;
+//					value[value_size] = ch;
+//					value_size++;
+//				}
+//				else
+//				{
+//					fprintf (stderr, "Параметр «%s» не является числом с плавающей точкой.", param);
+//					return -1;
+//				}
+//			}
+//				break;
+//
+//				/* Строка */
+//			case CONFI_TYPE_STRING:
+//			{
+//				if (ch == '"')
+//				{
+//					token = TOKEN_QUOTES_DOUBLE;
+//				}
+//				else if (ch == '\'')
+//				{
+//					token = TOKEN_QUOTES_SINGLE;
+//				}
+//				else
+//				{
+//					fprintf (stderr, "Параметр «%s» не является строкой.", param);
+//					return -1;
+//				}
+//			}
+//				break;
+//
+//				/* Булёвое значение */
+//			case CONFI_TYPE_BOOLEAN:
+//			{
+//				if (isalnum (ch))
+//				{
+//					token = TOKEN_BOOLEAN;
+//					value[value_size] = ch;
+//					value_size++;
+//				}
+//				else
+//				{
+//					fprintf (stderr, "Параметр «%s» не является булёвым значением.", param);
+//					return -1;
+//				}
+//			}
+//				break;
+//		}
+//	}
+}
+
+
+/**
+ * Токен значение
+ */
+int _token_value (char ch)
+{
+
+}

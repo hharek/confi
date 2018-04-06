@@ -4,8 +4,8 @@ project(confi)
 set(CMAKE_C_STANDARD 11)
 
 set(confi_SOURCE_FILES
-        config.h
-        config.c
+        confi.h
+        confi.c
         main.c)
 
 add_executable(confi ${confi_SOURCE_FILES})
