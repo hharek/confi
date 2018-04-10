@@ -45,27 +45,27 @@ int main()
 		perror ("Ошибка парсинга");
 	}
 
-	for (unsigned int i = 0; i < params_size; i++)
-	{
-		switch (params[i].type)
-		{
-			case CONFI_TYPE_INT:
-				printf ("%s = %d\n", params[i].name, *((int *)params[i].value));
-				break;
-
-			case CONFI_TYPE_DOUBLE:
-				printf ("%s = %lf\n", params[i].name, *((double *)params[i].value));
-				break;
-
-			case CONFI_TYPE_STRING:
-				printf ("%s = %s\n", params[i].name, (char *)params[i].value);
-				break;
-
-			case CONFI_TYPE_BOOLEAN:
-				printf ("%s = %d\n", params[i].name, *((bool *)params[i].value));
-				break;
-		}
-	}
+//	for (unsigned int i = 0; i < params_size; i++)
+//	{
+//		switch (params[i].type)
+//		{
+//			case CONFI_TYPE_INT:
+//				printf ("%s = %d\n", params[i].name, *((int *)params[i].value));
+//				break;
+//
+//			case CONFI_TYPE_DOUBLE:
+//				printf ("%s = %lf\n", params[i].name, *((double *)params[i].value));
+//				break;
+//
+//			case CONFI_TYPE_STRING:
+//				printf ("%s = %s\n", params[i].name, (char *)params[i].value);
+//				break;
+//
+//			case CONFI_TYPE_BOOLEAN:
+//				printf ("%s = %d\n", params[i].name, *((bool *)params[i].value));
+//				break;
+//		}
+//	}
 
     return 0;
 }
