@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "confi.h"
+#include "confi_err.h"
 
 /* Структура для токенов */
 static struct token
@@ -16,7 +17,7 @@ static struct token
 } * token_current, * tokens;
 
 /*  Прототипы статических функций */
-static void token_push (int type, char * content);
+static void _token_push (int type, char * content);
 static int _token_blank (char ch);
 static int _token_comment (char ch);
 static int _token_identified (char ch);
@@ -72,7 +73,7 @@ int confi_parse (const char * file, struct confi_param * params, unsigned int pa
     FILE * fp = fopen (dir, "r");
 	if (!fp)
 	{
-		return -1;
+		return ERR_NOT_OPEN_FILE;
 	}
 
 	/* Разбираем на токены */
@@ -117,31 +118,39 @@ int confi_parse (const char * file, struct confi_param * params, unsigned int pa
 		}
 	}
 
-	/* Разбираем параметры */
-	for (struct token * i = tokens; i != NULL; i = i->next)
+//	/* Разбираем параметры */
+//	for (struct token * i = tokens; i != NULL; i = i->next)
+//	{
+//		printf ("%s\n", i->content);
+//
+//		switch (i->type)
+//		{
+//			case TOKEN_IDENTIFIED:
+//			{
+//
+//			}
+//			break;
+//		}
+//	}
+
+	struct token * i = tokens;
+	while (i != NULL)
 	{
-		printf ("%s\n", i->content);
+		printf ("%s=%s\n", i->content, i->next->next->content);
 
-		switch (i->type)
-		{
-			case TOKEN_IDENTIFIED:
-			{
-
-			}
-			break;
-		}
+		i = i->next->next->next;
 	}
 
 	/* Закрыть файл */
     fclose (fp);
 
-	return 0;
+	return SUCCESS;
 }
 
 /**
  * Добавить токен
  */
-void token_push (int type, char * content)
+void _token_push (int type, char * content)
 {
 	struct token * next = malloc (sizeof (struct token));
 	next->type = type;
@@ -176,7 +185,7 @@ int _token_blank (char ch)
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;
-		token_push (TOKEN_EQUAL, strdup ("="));
+		_token_push (TOKEN_EQUAL, strdup ("="));
 
 		return TOKEN_BLANK;
 	}
@@ -225,11 +234,11 @@ int _token_identified (char ch)
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;
-		token_push (TOKEN_IDENTIFIED, strdup (buf));
+		_token_push (TOKEN_IDENTIFIED, strdup (buf));
 
 		if (ch == '=')
 		{
-			token_push (TOKEN_EQUAL, strdup ("="));
+			_token_push (TOKEN_EQUAL, strdup ("="));
 		}
 
 		return TOKEN_BLANK;
@@ -256,7 +265,7 @@ int _token_string (char ch)
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;
-		token_push (TOKEN_STRING, strdup (buf));
+		_token_push (TOKEN_STRING, strdup (buf));
 
 		return TOKEN_BLANK;
 	}

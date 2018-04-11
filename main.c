@@ -40,9 +40,9 @@ int main()
 	};
 
 	int result = confi_parse (file, params, params_size);
-	if (result == -1)
+	if (result != 0)
 	{
-		perror ("Ошибка парсинга");
+		fprintf (stderr, confi_err (result));
 	}
 
 //	for (unsigned int i = 0; i < params_size; i++)

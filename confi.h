@@ -25,3 +25,8 @@ struct confi_param
  * Спарсить файл
  */
 int confi_parse (const char * file, struct confi_param * params, unsigned int params_size);
+
+/**
+ * Показать сообщение об ошибке
+ */
+const char * confi_err (unsigned int code);
