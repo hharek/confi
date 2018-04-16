@@ -1,30 +1,32 @@
-/* Прототип */
-const char * confi_err (unsigned int code);
-
-/* Сообщения об ошибке */
-static enum
-{
-	SUCCESS,
-	ERR_COMMON,
-	ERR_NOT_OPEN_FILE
-};
-
-static const char * error_message[] =
-{
-	[SUCCESS] = "Success",
-	[ERR_COMMON] = "Common error",
-	[ERR_NOT_OPEN_FILE] = "Do not open the file"
-};
+#include <stdio.h>
+#include <stdarg.h>
 
 /**
- * Показать сообщение об ошибке
+ * Назначить сообщение об ошибке
  */
-const char * confi_err (unsigned int code)
-{
-	if (code > ERR_NOT_OPEN_FILE)
-	{
-		return "Unknown error";
-	}
+static void error (const char * format, ... );
 
-	return error_message[code];
+/**
+ * Последнее сообщение об ошибке
+ */
+static char * err[1024];
+
+/**
+ * Вернуть последнее сообщение об ошибке
+ */
+const char * confi_err ()
+{
+	return err;
+}
+
+/**
+ * Назначить сообщение об ошибке
+ */
+void error ( const char * format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	vsprintf (err, format, args);
+
+	va_end( args );
 }

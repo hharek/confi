@@ -1,5 +1,3 @@
-#include <stdbool.h>
-
 /**
  * Типы параметров
  */
@@ -29,4 +27,4 @@ int confi_parse (const char * file, struct confi_param * params, unsigned int pa
 /**
  * Показать сообщение об ошибке
  */
-const char * confi_err (unsigned int code);
+const char * confi_err ();
