@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+
+static enum
+{
+	ERROR_MAX_SIZE = 1024
+};
+
 /**
  * Назначить сообщение об ошибке
  */
@@ -9,14 +15,14 @@ static void error (const char * format, ... );
 /**
  * Последнее сообщение об ошибке
  */
-static char * err[1024];
+static char * err[ERROR_MAX_SIZE];
 
 /**
  * Вернуть последнее сообщение об ошибке
  */
 const char * confi_err ()
 {
-	return err;
+	return (char *)err;
 }
 
 /**
@@ -26,7 +32,7 @@ void error ( const char * format, ... )
 {
 	va_list args;
 	va_start( args, format );
-	vsprintf (err, format, args);
+	vsprintf ((char *)err, format, args);
 
 	va_end( args );
 }

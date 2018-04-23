@@ -5,7 +5,9 @@ set(CMAKE_C_STANDARD 11)
 
 set(confi_SOURCE_FILES
         confi.h
-        confi_err.h
+        confi_err.c
+        confi_token.c
+        confi_check.c
         confi.c
         main.c)
 
