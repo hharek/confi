@@ -1,3 +1,13 @@
+#pragma once
+
+/**
+ * Константы
+ */
+enum
+{
+	CONFI_FILE_MAX_SIZE = 4096
+};
+
 /**
  * Типы параметров
  */
@@ -22,9 +32,14 @@ struct confi_param
 /**
  * Спарсить файл
  */
-int confi_parse (const char * file, struct confi_param * params, unsigned int params_size);
+int confi (const char * file, struct confi_param * params);
+
+/**
+ * Спарсить строку
+ */
+int confi_parse_string (const char * str, struct confi_param * params);
 
 /**
  * Показать сообщение об ошибке
  */
-const char * confi_err ();
+char * confi_err ();

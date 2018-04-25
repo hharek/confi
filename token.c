@@ -4,121 +4,69 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-/******************************** Данные и структуры ********************************* */
-/* Структура токенов */
-static struct token
-{
-	int type;
-	char * content;
-	struct token * first;
-	struct token * next;
-};
+#include "token.h"
 
-/* Типы токенов */
-static enum
-{
-	TOKEN_BLANK,
-	TOKEN_WORD,
-	TOKEN_COMMENT,
-	TOKEN_EQUAL,
-	TOKEN_STRING,
-	TOKEN_SEMICOLON
-};
-
-static int token_type = TOKEN_BLANK;
-
-/* Максимальные и минимальные значения */
-static enum
-{
-	TOKEN_BUF_MAX_SIZE = 1024
-};
-
-/* Строки */
-static enum
-{
-	TOKEN_STRING_QUOTES_DOUBLE,
-	TOKEN_STRING_QUOTES_SINGLE
-};
-
-static int token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
-
-/* ************************** Прототипы статических функций ************************** */
-static struct token * token_parse_string (FILE * fp);
-
-static  int token_blank (char ch, struct token * tokens);
-static  int token_comment (char ch, struct token * tokens);
-static  int token_word (char ch, struct token * tokens);
-static  int token_string (char ch, struct token * tokens);
-static  int token_equal (char ch, struct token * tokens);
-static  int token_semicolon (char ch, struct token * tokens);
-
-static void token_push (int type, char * content, struct token ** tokens);
-
-static  int token_check (struct token * tokens);
-
-
-/* ************************************* Функции ************************************* */
 /**
  * Разбираем файл на токены
  */
-struct token * token_parse_string (FILE * fp)
+struct token * token_parse_string (const char * str)
 {
 	struct token * tokens = malloc (sizeof (struct token));
 
-	char ch;
-	while (true)
-	{
-		ch = (char)fgetc (fp);
-		if (feof (fp))
-		{
-			break;
-		}
+	token_push (TOKEN_WORD, "param", &tokens);
+	token_push (TOKEN_EQUAL, "=", &tokens);
+	token_push (TOKEN_WORD, "100", &tokens);
 
-		switch (token_type)
-		{
-			/* Код */
-			case TOKEN_BLANK:
-			{
-				token_type = token_blank (ch, tokens);
-			}
-			break;
-
-			/* Комментарий */
-			case TOKEN_COMMENT:
-			{
-				token_type = token_comment (ch, tokens);
-			}
-			break;
-
-			/* Идентификатор */
-			case TOKEN_WORD:
-			{
-				token_type = token_word (ch, tokens);
-			}
-			break;
-
-			/* Строка */
-			case TOKEN_STRING:
-			{
-				token_type = token_string (ch, tokens);
-			}
-			break;
-
-			/* Знак «=» */
-			case TOKEN_EQUAL:
-			{
-				token_type = token_equal (ch, tokens);
-			}
-			break;
-
-			/* Знак «;» */
-			case TOKEN_SEMICOLON:
-			{
-				token_type = token_semicolon (ch, tokens);
-			}
-			break;
-		}
-	}
+//	char ch;
+//	char * pos = (char *)str;
+//
+//	while ((ch = *(pos++)) != '\0')
+//	{
+//		switch (token_type)
+//		{
+//			/* Код */
+//			case TOKEN_BLANK:
+//			{
+//				token_type = token_blank (ch, tokens);
+//			}
+//			break;
+//
+//			/* Комментарий */
+//			case TOKEN_COMMENT:
+//			{
+//				token_type = token_comment (ch, tokens);
+//			}
+//			break;
+//
+//			/* Идентификатор */
+//			case TOKEN_WORD:
+//			{
+//				token_type = token_word (ch, tokens);
+//			}
+//			break;
+//
+//			/* Строка */
+//			case TOKEN_STRING:
+//			{
+//				token_type = token_string (ch, tokens);
+//			}
+//			break;
+//
+//			/* Знак «=» */
+//			case TOKEN_EQUAL:
+//			{
+//				token_type = token_equal (ch, tokens);
+//			}
+//			break;
+//
+//			/* Знак «;» */
+//			case TOKEN_SEMICOLON:
+//			{
+//				token_type = token_semicolon (ch, tokens);
+//			}
+//			break;
+//		}
+//	}
 
 	return tokens;
 }
@@ -259,6 +207,7 @@ void token_push (int type, char * content, struct token ** tokens)
 	struct token * t = malloc (sizeof (struct token));
 	t->type = type;
 	t->content = content;
+	t->first = (*tokens)->first;
 
 	if ((*tokens)->first == NULL)
 	{

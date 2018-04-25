@@ -5,10 +5,11 @@ set(CMAKE_C_STANDARD 11)
 
 set(confi_SOURCE_FILES
         confi.h
-        confi_err.c
-        confi_token.c
-        confi_check.c
         confi.c
+        error.h
+        error.c
+        token.h
+        token.c
         main.c)
 
 add_executable(confi ${confi_SOURCE_FILES})

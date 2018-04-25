@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include <stdbool.h>
 
 #include "confi.h"
 
 int main()
 {
 	const char * file = "main.conf";
-	unsigned  int params_size = 9;
+//	const char * file = "/home/tmp/kartina/01";
 	struct confi_param params[] =
 	{
 		{
@@ -44,37 +43,38 @@ int main()
 		{
 			.name = "param_boolean2",
 			.type = CONFI_TYPE_BOOLEAN
-		}
+		},
+		NULL
 	};
 
-	int result = confi_parse (file, params, params_size);
+	int result = confi (file, params);
 	if (result == -1)
 	{
 		fprintf (stderr, confi_err ());
-		return -1;
+		return 1;
 	}
 
-	for (unsigned int i = 0; i < params_size; i++)
-	{
-		switch (params[i].type)
-		{
-			case CONFI_TYPE_INT:
-				printf ("%s = %d\n", params[i].name, *((int *)params[i].value));
-				break;
-
-			case CONFI_TYPE_DOUBLE:
-				printf ("%s = %lf\n", params[i].name, *((double *)params[i].value));
-				break;
-
-			case CONFI_TYPE_STRING:
-				printf ("%s = %s\n", params[i].name, (char *)params[i].value);
-				break;
-
-			case CONFI_TYPE_BOOLEAN:
-				printf ("%s = %d\n", params[i].name, *((bool *)params[i].value));
-				break;
-		}
-	}
+//	for (unsigned int i = 0; i < params_size; i++)
+//	{
+//		switch (params[i].type)
+//		{
+//			case CONFI_TYPE_INT:
+//				printf ("%s = %d\n", params[i].name, *((int *)params[i].value));
+//				break;
+//
+//			case CONFI_TYPE_DOUBLE:
+//				printf ("%s = %lf\n", params[i].name, *((double *)params[i].value));
+//				break;
+//
+//			case CONFI_TYPE_STRING:
+//				printf ("%s = %s\n", params[i].name, (char *)params[i].value);
+//				break;
+//
+//			case CONFI_TYPE_BOOLEAN:
+//				printf ("%s = %d\n", params[i].name, *((bool *)params[i].value));
+//				break;
+//		}
+//	}
 
     return 0;
 }
