@@ -11,62 +11,58 @@
  */
 struct token * token_parse_string (const char * str)
 {
-	struct token * tokens = malloc (sizeof (struct token));
+	struct token * tokens = NULL;
 
-	token_push (TOKEN_WORD, "param", &tokens);
-	token_push (TOKEN_EQUAL, "=", &tokens);
-	token_push (TOKEN_WORD, "100", &tokens);
+	char ch;
+	char * pos = (char *)str;
 
-//	char ch;
-//	char * pos = (char *)str;
-//
-//	while ((ch = *(pos++)) != '\0')
-//	{
-//		switch (token_type)
-//		{
-//			/* Код */
-//			case TOKEN_BLANK:
-//			{
-//				token_type = token_blank (ch, tokens);
-//			}
-//			break;
-//
-//			/* Комментарий */
-//			case TOKEN_COMMENT:
-//			{
-//				token_type = token_comment (ch, tokens);
-//			}
-//			break;
-//
-//			/* Идентификатор */
-//			case TOKEN_WORD:
-//			{
-//				token_type = token_word (ch, tokens);
-//			}
-//			break;
-//
-//			/* Строка */
-//			case TOKEN_STRING:
-//			{
-//				token_type = token_string (ch, tokens);
-//			}
-//			break;
-//
-//			/* Знак «=» */
-//			case TOKEN_EQUAL:
-//			{
-//				token_type = token_equal (ch, tokens);
-//			}
-//			break;
-//
-//			/* Знак «;» */
-//			case TOKEN_SEMICOLON:
-//			{
-//				token_type = token_semicolon (ch, tokens);
-//			}
-//			break;
-//		}
-//	}
+	while ((ch = *(pos++)) != '\0')
+	{
+		switch (token_type)
+		{
+			/* Код */
+			case TOKEN_BLANK:
+			{
+				token_type = token_blank (ch, &tokens);
+			}
+			break;
+
+			/* Комментарий */
+			case TOKEN_COMMENT:
+			{
+				token_type = token_comment (ch, &tokens);
+			}
+			break;
+
+			/* Идентификатор */
+			case TOKEN_WORD:
+			{
+				token_type = token_word (ch, &tokens);
+			}
+			break;
+
+			/* Строка */
+			case TOKEN_STRING:
+			{
+				token_type = token_string (ch, &tokens);
+			}
+			break;
+
+			/* Знак «=» */
+			case TOKEN_EQUAL:
+			{
+				token_type = token_equal (ch, &tokens);
+			}
+			break;
+
+			/* Знак «;» */
+			case TOKEN_SEMICOLON:
+			{
+				token_type = token_semicolon (ch, &tokens);
+			}
+			break;
+		}
+	}
 
 	return tokens;
 }
@@ -74,7 +70,7 @@ struct token * token_parse_string (const char * str)
 /**
  * Токен «код»
  */
-int token_blank (char ch, struct token * tokens)
+int token_blank (char ch, struct token ** tokens)
 {
 	if (ch == '#')
 	{
@@ -113,7 +109,7 @@ int token_blank (char ch, struct token * tokens)
 /**
  * Токен «комментарий»
  */
-int token_comment (char ch, struct token * tokens)
+int token_comment (char ch, struct token ** tokens)
 {
 	if (ch == '\n')
 	{
@@ -128,7 +124,7 @@ int token_comment (char ch, struct token * tokens)
 /**
  * Токен «слово»
  */
-int token_word (char ch, struct token * tokens)
+int token_word (char ch, struct token ** tokens)
 {
 	static char         buf[TOKEN_BUF_MAX_SIZE + 1] = {'\0'};
 	static unsigned int buf_size = 0;
@@ -137,7 +133,7 @@ int token_word (char ch, struct token * tokens)
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;
-		token_push (TOKEN_WORD, strdup (buf), &tokens);
+		token_push (TOKEN_WORD, strdup (buf), tokens);
 
 		return token_blank (ch, tokens);
 	}
@@ -153,7 +149,7 @@ int token_word (char ch, struct token * tokens)
 /**
  * Токен «строка»
  */
-int token_string (char ch, struct token * tokens)
+int token_string (char ch, struct token ** tokens)
 {
 	static char         buf[TOKEN_BUF_MAX_SIZE + 1] = {'\0'};
 	static unsigned int buf_size = 0;
@@ -166,7 +162,7 @@ int token_string (char ch, struct token * tokens)
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;
-		token_push (TOKEN_STRING, strdup (buf), &tokens);
+		token_push (TOKEN_STRING, strdup (buf), tokens);
 
 		return TOKEN_BLANK;
 	}
@@ -182,9 +178,9 @@ int token_string (char ch, struct token * tokens)
 /**
  * Токен «=»
  */
-int token_equal (char ch, struct token * tokens)
+int token_equal (char ch, struct token ** tokens)
 {
-	token_push (TOKEN_EQUAL, strdup ("="), &tokens);
+	token_push (TOKEN_EQUAL, strdup ("="), tokens);
 
 	return token_blank (ch, tokens);
 }
@@ -192,9 +188,9 @@ int token_equal (char ch, struct token * tokens)
 /**
  * Токен «;»
  */
-int token_semicolon (char ch, struct token * tokens)
+int token_semicolon (char ch, struct token ** tokens)
 {
-	token_push (TOKEN_SEMICOLON, strdup (";"), &tokens);
+	token_push (TOKEN_SEMICOLON, strdup (";"), tokens);
 
 	return token_blank (ch, tokens);
 }
@@ -204,21 +200,42 @@ int token_semicolon (char ch, struct token * tokens)
  */
 void token_push (int type, char * content, struct token ** tokens)
 {
-	struct token * t = malloc (sizeof (struct token));
-	t->type = type;
-	t->content = content;
-	t->first = (*tokens)->first;
+	struct token * next = malloc (sizeof (struct token));
+	next->type = type;
+	next->content = content;
 
-	if ((*tokens)->first == NULL)
+	/* Первый элемент */
+	if (* tokens == NULL)
 	{
-		(*tokens)->first = t;
-		*tokens = t;
-
+		* tokens = next;
 		return;
 	}
 
-	(*tokens)->next = t;
-	*tokens = t;
+	/* Находим последний элемент и добавляем */
+	struct token * i = * tokens;
+	while (i->next != NULL)
+	{
+		i = i->next;
+	}
+
+	i->next = next;
+
+
+//	struct token * t = malloc (sizeof (struct token));
+//	t->type = type;
+//	t->content = content;
+//	t->first = (*tokens)->first;
+//
+//	if ((*tokens)->first == NULL)
+//	{
+//		(*tokens)->first = t;
+//		*tokens = t;
+//
+//		return;
+//	}
+//
+//	(*tokens)->next = t;
+//	*tokens = t;
 }
 
 /* Проверяем порядок расположения токенов */

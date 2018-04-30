@@ -6,7 +6,6 @@ static struct token
 {
 	int type;
 	char * content;
-	struct token * first;
 	struct token * next;
 };
 
@@ -41,12 +40,12 @@ static int token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
 /*** Прототипы функций ***/
 static struct token * token_parse_string (const char * str);
 
-static  int token_blank (char ch, struct token * tokens);
-static  int token_comment (char ch, struct token * tokens);
-static  int token_word (char ch, struct token * tokens);
-static  int token_string (char ch, struct token * tokens);
-static  int token_equal (char ch, struct token * tokens);
-static  int token_semicolon (char ch, struct token * tokens);
+static  int token_blank (char ch, struct token ** tokens);
+static  int token_comment (char ch, struct token ** tokens);
+static  int token_word (char ch, struct token ** tokens);
+static  int token_string (char ch, struct token ** tokens);
+static  int token_equal (char ch, struct token ** tokens);
+static  int token_semicolon (char ch, struct token ** tokens);
 
 static void token_push (int type, char * content, struct token ** tokens);
 

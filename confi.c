@@ -55,11 +55,11 @@ int confi (const char * file, struct confi_param * params)
 
 	char content[CONFI_FILE_MAX_SIZE + 1];
 	fread (content, CONFI_FILE_MAX_SIZE, 1, fp);
-	if (strlen (content) != st.st_size)
-	{
-		error ("Файл не является текстовым.");
-		return -1;
-	}
+//	if (strlen (content) != st.st_size)
+//	{
+//		error ("Файл не является текстовым.");
+//		return -1;
+//	}
 
 
 	/* Парсим */
@@ -82,7 +82,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	/* Разбираем файл на токены */
 	struct token * tokens = token_parse_string (str);
 
-	struct token * i = tokens->first;
+	struct token * i = tokens;
 	while (i != NULL)
 	{
 		printf ("%s\n", i->content);
