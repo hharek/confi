@@ -49,4 +49,4 @@ static  int token_semicolon (char ch, struct token ** tokens);
 
 static void token_push (int type, char * content, struct token ** tokens);
 
-static  int token_check (struct token * tokens);
+static  int token_check_order (struct token * tokens);

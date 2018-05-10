@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -5,6 +7,8 @@
 #include <stdbool.h>
 
 #include "token.h"
+#include "error.h"
+#include "error.c"
 
 /**
  * Разбираем файл на токены
@@ -63,6 +67,19 @@ struct token * token_parse_string (const char * str)
 			break;
 		}
 	}
+
+	/* Проверяем порядок следования токенов */
+	if (token_check_order (tokens) == -1)
+	{
+		return -1;
+	}
+
+//	struct token * i = tokens;
+//	while (i != NULL)
+//	{
+//		printf ("%s\n", i->content);
+//		i = i->next;
+//	}
 
 	return tokens;
 }
@@ -219,27 +236,12 @@ void token_push (int type, char * content, struct token ** tokens)
 	}
 
 	i->next = next;
-
-
-//	struct token * t = malloc (sizeof (struct token));
-//	t->type = type;
-//	t->content = content;
-//	t->first = (*tokens)->first;
-//
-//	if ((*tokens)->first == NULL)
-//	{
-//		(*tokens)->first = t;
-//		*tokens = t;
-//
-//		return;
-//	}
-//
-//	(*tokens)->next = t;
-//	*tokens = t;
 }
 
-/* Проверяем порядок расположения токенов */
-int token_check (struct token * tokens)
+/**
+ * Проверяем порядок расположения токенов
+ */
+int token_check_order (struct token * tokens)
 {
 	struct token * i = tokens;
 	while (i != NULL)
@@ -252,6 +254,8 @@ int token_check (struct token * tokens)
 			i->next->next->next->type != TOKEN_SEMICOLON
 		)
 		{
+			error ("Неверный порядок токенов после параметра: «%s» ", i->content);
+
 			return -1;
 		}
 

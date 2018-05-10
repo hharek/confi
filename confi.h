@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /**
  * Константы
  */
@@ -26,7 +28,9 @@ struct confi_param
 {
 	const char * name;
 	enum confi_type type;
-	void * value;
+	char * value;
+	bool require;
+	void * ptr;
 };
 
 /**

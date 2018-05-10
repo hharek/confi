@@ -10,6 +10,8 @@ set(confi_SOURCE_FILES
         error.c
         token.h
         token.c
+        value.h
+        value.c
         main.c)
 
 add_executable(confi ${confi_SOURCE_FILES})

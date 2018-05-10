@@ -6,12 +6,13 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-
 #include "confi.h"
 #include "error.h"
 #include "error.c"
 #include "token.h"
 #include "token.c"
+#include "value.h"
+#include "value.c"
 
 //static bool _check_param (char * str);
 //static bool _check_value (char * str, enum confi_type type);
@@ -43,7 +44,6 @@ int confi (const char * file, struct confi_param * params)
 		return -1;
 	}
 
-
 	/* Проверка файла */
 	struct stat st;
 	fstat (fileno(fp), &st);
@@ -60,7 +60,6 @@ int confi (const char * file, struct confi_param * params)
 //		error ("Файл не является текстовым.");
 //		return -1;
 //	}
-
 
 	/* Парсим */
 	if (confi_parse_string (content, params) == -1)
@@ -81,20 +80,69 @@ int confi_parse_string (const char * str, struct confi_param * params)
 {
 	/* Разбираем файл на токены */
 	struct token * tokens = token_parse_string (str);
-
-	struct token * i = tokens;
-	while (i != NULL)
+	if (tokens == NULL)
 	{
-		printf ("%s\n", i->content);
-		i = i->next;
+		return -1;
 	}
 
-//	/* Проверяем порядок следования токенов */
-//	if (token_check (tokens) == -1)
-//	{
-//		return -1;
-//	}
-//
+	/* Заполняем значениями параметры */
+	struct token * t = tokens;
+	while (t != NULL)
+	{
+		struct confi_param * param = params;
+
+		while (param->name != NULL)
+		{
+			if (strcmp (t->content, param->name) == 0)
+			{
+				param->value = strdup (t->next->next->content);
+				break;
+			}
+
+			param++;
+		}
+
+		if (param->name == NULL)
+		{
+			error ("Неизвестный параметр: «%s».", t->content);
+			return -1;
+		}
+
+		t = t->next->next->next->next;
+	}
+
+	/* Очищаем массив токенов */
+	t = tokens;
+	while (t != NULL)
+	{
+		void * old = (void *) t;
+		t = t->next;
+		free (old);
+	}
+
+	/* Проверяем параметры */
+	struct confi_param * param = params;
+	while (param->name != NULL)
+	{
+		/* Обязательный параметр */
+		if (param->require && param->value == NULL)
+		{
+			error ("Параметр «%s» является обязательным для заполнения.", param->name);
+			return -1;
+		}
+
+		/* Назначаем */
+		if (param->value != NULL)
+		{
+			if (value_set (param) == -1)
+			{
+				return -1;
+			}
+		}
+
+		param++;
+	}
+
 //	/* Разбираем токены */
 //	struct token * i = tokens;
 //	while (i != NULL)
