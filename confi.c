@@ -70,7 +70,7 @@ int confi (const char * file, struct confi_param * params)
  */
 int confi_parse_string (const char * str, struct confi_param * params)
 {
-	/* Разбираем файл на токены */
+	/* Разбираем строку на токены */
 	struct token * tokens = token_parse_string (str);
 	if (tokens == NULL)
 	{
@@ -87,7 +87,14 @@ int confi_parse_string (const char * str, struct confi_param * params)
 		{
 			if (strcmp (t->content, param->name) == 0)
 			{
+				if (param->_isset)
+				{
+					error ("Параметр «%s» повторяется.", t->content);
+					return -1;
+				}
+
 				param->value = strdup (t->next->next->content);
+				param->_isset = true;
 				break;
 			}
 
@@ -112,6 +119,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 		free (old);
 	}
 
+	/* Проверяем и назначаем данные */
 	struct confi_param * param = params;
 	while (param->name != NULL)
 	{
