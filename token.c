@@ -71,7 +71,7 @@ struct token * token_parse_string (const char * str)
 	/* Проверяем порядок следования токенов */
 	if (token_check_order (tokens) == -1)
 	{
-		return -1;
+		return NULL;
 	}
 
 //	struct token * i = tokens;
@@ -99,11 +99,11 @@ int token_blank (char ch, struct token ** tokens)
 	}
 	else if (ch == '=')
 	{
-		return TOKEN_EQUAL;
+		return token_equal (ch, tokens);
 	}
 	else if (ch == ';')
 	{
-		return TOKEN_SEMICOLON;
+		return token_semicolon (ch, tokens);
 	}
 	else if (ch == '"')
 	{
@@ -199,7 +199,7 @@ int token_equal (char ch, struct token ** tokens)
 {
 	token_push (TOKEN_EQUAL, strdup ("="), tokens);
 
-	return token_blank (ch, tokens);
+	return TOKEN_BLANK;
 }
 
 /**
@@ -209,7 +209,7 @@ int token_semicolon (char ch, struct token ** tokens)
 {
 	token_push (TOKEN_SEMICOLON, strdup (";"), tokens);
 
-	return token_blank (ch, tokens);
+	return TOKEN_BLANK;
 }
 
 /**
@@ -249,9 +249,9 @@ int token_check_order (struct token * tokens)
 		if
 		(
 			i->type != TOKEN_WORD ||
-			i->next->type != TOKEN_EQUAL ||
-			(i->next->next->type != TOKEN_WORD && i->next->next->type != TOKEN_STRING) ||
-			i->next->next->next->type != TOKEN_SEMICOLON
+			i->next == NULL || i->next->type != TOKEN_EQUAL ||
+			i->next->next == NULL || (i->next->next->type != TOKEN_WORD && i->next->next->type != TOKEN_STRING) ||
+			i->next->next->next == NULL ||i->next->next->next->type != TOKEN_SEMICOLON
 		)
 		{
 			error ("Неверный порядок токенов после параметра: «%s» ", i->content);

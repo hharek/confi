@@ -17,20 +17,22 @@ int main()
 		bool param_boolean1;
 		bool param_boolean2;
 		char * param_default;
+		int param_repeat;
 	} params;
 
 	struct confi_param confi_params[] =
 	{
-		{ .name = "param_int1",		.type = CONFI_TYPE_INT,		.ptr = &params.param_int1										},
-		{ .name = "param_int2",		.type = CONFI_TYPE_INT, 	.ptr = &params.param_int2										},
-		{ .name = "param_double1",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double1 									},
-		{ .name = "param_double2",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double2,		.require = true				},
-		{ .name = "param_min",		.type = CONFI_TYPE_INT,		.ptr = &params.param_min 										},
-		{ .name = "param_string1",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string1									},
-		{ .name = "param_string2",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string2 									},
-		{ .name = "param_boolean1",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean1 									},
-		{ .name = "param_boolean2",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean2, 		.require = true				},
-		{ .name = "param_default",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_default,		.value = "test_default" 	},
+		{ .name = "param_int1",		.type = CONFI_TYPE_INT,		.ptr = &params.param_int1												},
+		{ .name = "param_int2",		.type = CONFI_TYPE_INT, 	.ptr = &params.param_int2												},
+		{ .name = "param_double1",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double1 											},
+		{ .name = "param_double2",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double2,	.require = true							},
+		{ .name = "param_min",		.type = CONFI_TYPE_INT,		.ptr = &params.param_min 												},
+		{ .name = "param_string1",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string1											},
+		{ .name = "param_string2",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string2 											},
+		{ .name = "param_boolean1",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean1 											},
+		{ .name = "param_boolean2",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean2, 	.require = true							},
+		{ .name = "param_default",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_default,					.value = "test_default" },
+		{ .name = "param_repeat",	.type = CONFI_TYPE_INT,		.ptr = &params.param_repeat												},
 		NULL
 	};
 
@@ -51,6 +53,7 @@ int main()
 	printf ("param_boolean1 = %d\n", params.param_boolean1);
 	printf ("param_boolean2 = %d\n", params.param_boolean2);
 	printf ("param_default = %s\n", params.param_default);
+	printf ("param_repeat = %d\n", params.param_repeat);
 
     return 0;
 }
