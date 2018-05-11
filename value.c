@@ -86,7 +86,7 @@ int value_set_string (struct confi_param * param)
 
 	if (param->ptr != NULL)
 	{
-		param->ptr = (void *) strdup (param->value);
+		*((char **)param->ptr) = strdup (param->value);
 	}
 
 	return 0;
