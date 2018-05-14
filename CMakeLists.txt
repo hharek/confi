@@ -11,7 +11,8 @@ set(confi_SOURCE_FILES
         token.h
         token.c
         value.h
-        value.c
-        main.c)
+        value.c)
 
-add_executable(confi ${confi_SOURCE_FILES})
+add_library(confi SHARED ${confi_SOURCE_FILES})
+
+add_subdirectory(example)
