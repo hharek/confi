@@ -15,10 +15,21 @@
 #include "value.c"
 
 /**
+ * Проверить массив структур confi_params
+ */
+static int confi_params_check (struct confi_param * params);
+
+/**
  * Спарсить файл
  */
 int confi (const char * file, struct confi_param * params)
 {
+	/* Проверка параметров */
+	if (confi_params_check (params) == -1)
+	{
+		return -1;
+	}
+
 	/* Текушая папка */
 	char dir[1024] = {'\0'};
 	if (file[0] != '/')
@@ -78,32 +89,48 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	}
 
 	/* Заполняем значениями параметры */
-	struct token * t = tokens;
-	while (t != NULL)
+	struct confi_param * param = params;
+	struct token * t;
+	while (param->name != NULL)
 	{
-		struct confi_param * param = params;
-
-		while (param->name != NULL)
+		/* Назначаем параметрам значения с конфиг. файла */
+		t = tokens;
+		bool isset = false;
+		while (t != NULL)
 		{
-			if (strcmp (t->content, param->name) == 0)
+			if (strcmp (param->name, t->content) == 0)
 			{
-				if (param->_isset)
+				if (isset)
 				{
-					error ("Параметр «%s» повторяется.", t->content);
+					error ("Параметр «%s» повторяется.", param->name);
 					return -1;
 				}
 
+				isset = true;
 				param->value = strdup (t->next->next->content);
-				param->_isset = true;
-				break;
+				t->param_isset = true;
 			}
 
-			param++;
+			t = t->next->next->next->next;
 		}
 
-		if (param->name == NULL)
+		/* Обязательный параметр */
+		if (param->require && !isset)
 		{
-			error ("Неизвестный параметр: «%s».", t->content);
+			error ("Параметр «%s» является обязательным для заполнения.", param->name);
+			return -1;
+		}
+
+		param++;
+	}
+
+	/* Неизвестные параметры */
+	t = tokens;
+	while (t != NULL)
+	{
+		if (!t->param_isset)
+		{
+			error ("Неизвестный параметр «%s».", t->content);
 			return -1;
 		}
 
@@ -120,17 +147,9 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	}
 
 	/* Проверяем и назначаем данные */
-	struct confi_param * param = params;
+	param = params;
 	while (param->name != NULL)
 	{
-		/* Обязательный параметр */
-		if (param->require && param->value == NULL)
-		{
-			error ("Параметр «%s» является обязательным для заполнения.", param->name);
-			return -1;
-		}
-
-		/* Назначаем */
 		if (param->value != NULL)
 		{
 			if (value_set (param) == -1)
@@ -149,4 +168,35 @@ int confi_parse_string (const char * str, struct confi_param * params)
 char * confi_err ()
 {
 	return (char *)err;
+}
+
+/**
+ * Проверить массив структур confi_params
+ */
+int confi_params_check (struct confi_param * params)
+{
+	struct confi_param * param = params;
+	while (param->name != NULL)
+	{
+		char * name = (char *)param->name;
+		char ch = name[0];
+		if (!isalpha (ch) && ch != '_')
+		{
+			error ("Параметр «%s» имеет недопустимые символы. Название параметра может начинатся с символа: «a-z», «_»", param->name);
+			return -1;
+		}
+
+		while ((ch = *(name++)) != '\0')
+		{
+			if (!isalnum (ch) && ch != '-' && ch != '_')
+			{
+				error ("Параметр «%s» имеет недопустимые символы. Допускается: «a-z», «-», «_»", param->name);
+				return -1;
+			}
+		}
+
+		param++;
+	}
+
+	return 0;
 }

@@ -31,8 +31,6 @@ struct confi_param
 	char * value;
 	bool require;
 	void * ptr;
-
-	bool _isset;
 };
 
 /**

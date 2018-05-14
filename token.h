@@ -7,6 +7,7 @@ static struct token
 	int type;
 	char * content;
 	struct token * next;
+	bool param_isset;
 };
 
 /* Типы токенов */
