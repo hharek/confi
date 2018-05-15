@@ -14,64 +14,94 @@
 #include "value.h"
 #include "value.c"
 
-/**
- * Проверить массив структур confi_params
- */
+/* Проверить конфигурационный файл */
+static int confi_file_check (const char * file, FILE ** fp);
+
+/* Проверить массив структур confi_params */
 static int confi_params_check (struct confi_param * params);
+
 
 /**
  * Спарсить файл
  */
 int confi (const char * file, struct confi_param * params)
 {
+	FILE * fp;
+
+	/* Проверить конфигурационный файл */
+	int result = confi_file_check (file, &fp);
+	if (result != 0)
+	{
+		return result;
+	}
+
+	/* Читаем файл */
+	char content[CONFI_FILE_MAX_SIZE + 1];
+	fread (content, CONFI_FILE_MAX_SIZE, 1, fp);
+
 	/* Проверка параметров */
 	if (confi_params_check (params) == -1)
 	{
-		return -1;
+		return -4;
 	}
-
-	/* Текушая папка */
-	char dir[1024] = {'\0'};
-	if (file[0] != '/')
-	{
-		getcwd (dir, sizeof (dir));
-		strcat (dir, "/");
-	}
-	strcat (dir, file);
-
-	/* Открыть файл */
-    FILE * fp = fopen (dir, "r");
-	if (!fp)
-	{
-		error ("Невозможно открыть файл «%s».", file);
-		return -1;
-	}
-
-	/* Проверка файла */
-	struct stat st;
-	fstat (fileno(fp), &st);
-	if (st.st_size > CONFI_FILE_MAX_SIZE)
-	{
-		error ("Размер файла не должен превышать «%d» байт.", CONFI_FILE_MAX_SIZE);
-		return -1;
-	}
-
-	char content[CONFI_FILE_MAX_SIZE + 1];
-	fread (content, CONFI_FILE_MAX_SIZE, 1, fp);
-//	if (strlen (content) != st.st_size)
-//	{
-//		error ("Файл не является текстовым.");
-//		return -1;
-//	}
 
 	/* Парсим */
 	if (confi_parse_string (content, params) == -1)
 	{
-		return -1;
+		return -5;
 	}
 
 	/* Закрыть файл */
     fclose (fp);
+
+	return 0;
+}
+
+/**
+ * Проверить файл
+ */
+int confi_file_check (const char * file, FILE ** fp)
+{
+	/* Текушая папка */
+	char path[1024] = {'\0'};
+	if (file[0] != '/')
+	{
+		getcwd (path, sizeof (path));
+		strcat (path, "/");
+	}
+	strcat (path, file);
+
+	/* Открыть файл */
+	*fp = fopen (path, "r");
+	if (!*fp)
+	{
+		error ("Невозможно открыть файл «%s».", file);
+		return -11;
+	}
+
+	/* Статистика по файлу */
+	struct stat st;
+	fstat (fileno(*fp), &st);
+	if (st.st_size > CONFI_FILE_MAX_SIZE)
+	{
+		error ("Размер файла не должен превышать «%d» байт.", CONFI_FILE_MAX_SIZE);
+		return -12;
+	}
+
+	/* Бинарный файл */
+	int ch;
+	do
+	{
+		ch = fgetc(*fp);
+
+		if (ch == '\0')
+		{
+			error ("Файл «%s» не является текстовым.", file);
+			return -13;
+		}
+	}
+	while (ch != EOF);
+	fseek (*fp, 0, SEEK_SET);
 
 	return 0;
 }

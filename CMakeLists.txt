@@ -16,3 +16,4 @@ set(confi_SOURCE_FILES
 add_library(confi SHARED ${confi_SOURCE_FILES})
 
 add_subdirectory(example)
+add_subdirectory(tests)
