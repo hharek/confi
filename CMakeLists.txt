@@ -8,6 +8,8 @@ set(confi_SOURCE_FILES
         confi.c
         error.h
         error.c
+        check.h
+        check.c
         token.h
         token.c
         value.h

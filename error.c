@@ -1,18 +1,28 @@
 #pragma once
 
 #include <stdio.h>
-#include <stdarg.h>
+#include <string.h>
 
+#include "confi.h"
 #include "error.h"
 
 /**
  * Назначить сообщение об ошибке
  */
-void error (char * format, ... )
+enum confi_err_code error (enum confi_err_code code, const char * message, const char * name)
 {
-	va_list args;
-	va_start( args, format );
-	vsprintf ((char *)err, format, args);
+	err.code = code;
 
-	va_end( args );
+	if (name != NULL)
+	{
+		strncpy (err.name, name, 1024);
+		sprintf (err.message, message, name);
+	}
+	else
+	{
+		strncpy (err.message, message, 2048);
+	}
+
+
+	return code;
 }

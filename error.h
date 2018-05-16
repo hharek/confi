@@ -1,21 +1,17 @@
 #pragma once
 
 #include <stdarg.h>
-
-static enum
-{
-	ERROR_MAX_SIZE = 2048			/* Максимальный размер текста ошибки */
-};
+#include "confi.h"
 
 /**
  * Последнее сообщение об ошибке
  */
-static char * err[ERROR_MAX_SIZE];
+static struct confi_err err;
 
 /**
  * Назначить сообщение об ошибке
  */
-static void error (char * format, ... );
+static enum confi_err_code error (enum confi_err_code code, const char * message, const char * name);
 
 
 

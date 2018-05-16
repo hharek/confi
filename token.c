@@ -254,9 +254,7 @@ int token_check_order (struct token * tokens)
 			i->next->next->next == NULL ||i->next->next->next->type != TOKEN_SEMICOLON
 		)
 		{
-			error ("Неверный порядок токенов после параметра: «%s» ", i->content);
-
-			return -1;
+			return error (CONFI_ERR_TOKEN_ORDER, "Неверный порядок токенов после параметра: «%s» ", i->content);
 		}
 
 		i = i->next->next->next->next;

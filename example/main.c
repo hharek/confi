@@ -37,9 +37,9 @@ int main()
 	};
 
 	int result = confi ("main.conf", confi_params);
-	if (result == -1)
+	if (result != 0)
 	{
-		fprintf (stderr, confi_err ());
+		fprintf (stderr, confi_err ()->message);
 		return 1;
 	}
 

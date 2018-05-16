@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 11)
 
 set(confi_tests_SOURCE_FILES
         ../confi.h
-        file_not_found.c
+        file.c
         main.c)
 
 add_executable(tests ${confi_tests_SOURCE_FILES})

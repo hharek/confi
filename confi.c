@@ -1,25 +1,17 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
 
 #include "confi.h"
 #include "error.h"
 #include "error.c"
+#include "check.h"
+#include "check.c"
 #include "token.h"
 #include "token.c"
 #include "value.h"
 #include "value.c"
-
-/* Проверить конфигурационный файл */
-static int confi_file_check (const char * file, FILE ** fp);
-
-/* Проверить массив структур confi_params */
-static int confi_params_check (struct confi_param * params);
-
 
 /**
  * Спарсить файл
@@ -27,9 +19,10 @@ static int confi_params_check (struct confi_param * params);
 int confi (const char * file, struct confi_param * params)
 {
 	FILE * fp;
+	int result = 0;
 
 	/* Проверить конфигурационный файл */
-	int result = confi_file_check (file, &fp);
+	result = confi_file_check (file, &fp);
 	if (result != 0)
 	{
 		return result;
@@ -40,68 +33,21 @@ int confi (const char * file, struct confi_param * params)
 	fread (content, CONFI_FILE_MAX_SIZE, 1, fp);
 
 	/* Проверка параметров */
-	if (confi_params_check (params) == -1)
+	result = confi_params_check (params);
+	if (result != 0)
 	{
-		return -4;
+		return result;
 	}
 
 	/* Парсим */
-	if (confi_parse_string (content, params) == -1)
+	result = confi_parse_string (content, params);
+	if (result != 0)
 	{
-		return -5;
+		return result;
 	}
 
 	/* Закрыть файл */
     fclose (fp);
-
-	return 0;
-}
-
-/**
- * Проверить файл
- */
-int confi_file_check (const char * file, FILE ** fp)
-{
-	/* Текушая папка */
-	char path[1024] = {'\0'};
-	if (file[0] != '/')
-	{
-		getcwd (path, sizeof (path));
-		strcat (path, "/");
-	}
-	strcat (path, file);
-
-	/* Открыть файл */
-	*fp = fopen (path, "r");
-	if (!*fp)
-	{
-		error ("Невозможно открыть файл «%s».", file);
-		return -11;
-	}
-
-	/* Статистика по файлу */
-	struct stat st;
-	fstat (fileno(*fp), &st);
-	if (st.st_size > CONFI_FILE_MAX_SIZE)
-	{
-		error ("Размер файла не должен превышать «%d» байт.", CONFI_FILE_MAX_SIZE);
-		return -12;
-	}
-
-	/* Бинарный файл */
-	int ch;
-	do
-	{
-		ch = fgetc(*fp);
-
-		if (ch == '\0')
-		{
-			error ("Файл «%s» не является текстовым.", file);
-			return -13;
-		}
-	}
-	while (ch != EOF);
-	fseek (*fp, 0, SEEK_SET);
 
 	return 0;
 }
@@ -115,7 +61,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	struct token * tokens = token_parse_string (str);
 	if (tokens == NULL)
 	{
-		return -1;
+		return confi_err ()->code;
 	}
 
 	/* Заполняем значениями параметры */
@@ -132,8 +78,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 			{
 				if (isset)
 				{
-					error ("Параметр «%s» повторяется.", param->name);
-					return -1;
+					return error (CONFI_ERR_PARAM_REPEAT, "Параметр «%s» повторяется.", param->name);
 				}
 
 				isset = true;
@@ -147,8 +92,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 		/* Обязательный параметр */
 		if (param->require && !isset)
 		{
-			error ("Параметр «%s» является обязательным для заполнения.", param->name);
-			return -1;
+			return error (CONFI_ERR_PARAM_REQUIRE, "Параметр «%s» является обязательным для заполнения.", param->name);
 		}
 
 		param++;
@@ -160,8 +104,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	{
 		if (!t->param_isset)
 		{
-			error ("Неизвестный параметр «%s».", t->content);
-			return -1;
+			return error (CONFI_ERR_PARAM_UNKNOWN, "Неизвестный параметр «%s».", t->content);
 		}
 
 		t = t->next->next->next->next;
@@ -195,38 +138,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 /**
  * Вернуть последнее сообщение об ошибке
  */
-char * confi_err ()
+struct confi_err * confi_err ()
 {
-	return (char *)err;
-}
-
-/**
- * Проверить массив структур confi_params
- */
-int confi_params_check (struct confi_param * params)
-{
-	struct confi_param * param = params;
-	while (param->name != NULL)
-	{
-		char * name = (char *)param->name;
-		char ch = name[0];
-		if (!isalpha (ch) && ch != '_')
-		{
-			error ("Параметр «%s» имеет недопустимые символы. Название параметра может начинатся с символа: «a-z», «_»", param->name);
-			return -1;
-		}
-
-		while ((ch = *(name++)) != '\0')
-		{
-			if (!isalnum (ch) && ch != '-' && ch != '_')
-			{
-				error ("Параметр «%s» имеет недопустимые символы. Допускается: «a-z», «-», «_»", param->name);
-				return -1;
-			}
-		}
-
-		param++;
-	}
-
-	return 0;
+	return &err;
 }
