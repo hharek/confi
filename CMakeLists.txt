@@ -6,8 +6,8 @@ set(CMAKE_C_STANDARD 11)
 set(confi_SOURCE_FILES
         confi.h
         confi.c
-        error.h
-        error.c
+        err.h
+        err.c
         check.h
         check.c
         token.h

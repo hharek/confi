@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 #include "confi.h"
-#include "error.h"
-#include "error.c"
+#include "err.h"
+#include "err.c"
 #include "check.h"
 #include "check.c"
 #include "token.h"
@@ -78,7 +78,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 			{
 				if (isset)
 				{
-					return error (CONFI_ERR_PARAM_REPEAT, "Параметр «%s» повторяется.", param->name);
+					return err (CONFI_ERR_PARAM_REPEAT, "Параметр «%s» повторяется.", param->name);
 				}
 
 				isset = true;
@@ -92,7 +92,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 		/* Обязательный параметр */
 		if (param->require && !isset)
 		{
-			return error (CONFI_ERR_PARAM_REQUIRE, "Параметр «%s» является обязательным для заполнения.", param->name);
+			return err (CONFI_ERR_PARAM_REQUIRE, "Параметр «%s» является обязательным для заполнения.", param->name);
 		}
 
 		param++;
@@ -104,7 +104,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	{
 		if (!t->param_isset)
 		{
-			return error (CONFI_ERR_PARAM_UNKNOWN, "Неизвестный параметр «%s».", t->content);
+			return err (CONFI_ERR_PARAM_UNKNOWN, "Неизвестный параметр «%s».", t->content);
 		}
 
 		t = t->next->next->next->next;

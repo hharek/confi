@@ -7,8 +7,8 @@
 #include <stdbool.h>
 
 #include "token.h"
-#include "error.h"
-#include "error.c"
+#include "err.h"
+#include "err.c"
 
 /**
  * Разбираем файл на токены
@@ -254,7 +254,7 @@ int token_check_order (struct token * tokens)
 			i->next->next->next == NULL ||i->next->next->next->type != TOKEN_SEMICOLON
 		)
 		{
-			return error (CONFI_ERR_TOKEN_ORDER, "Неверный порядок токенов после параметра: «%s» ", i->content);
+			return err (CONFI_ERR_TOKEN_ORDER, "Неверный порядок токенов после параметра: «%s» ", i->content);
 		}
 
 		i = i->next->next->next->next;

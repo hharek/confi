@@ -48,7 +48,8 @@ int confi_parse_string (const char * str, struct confi_param * params);
  */
 enum confi_err_code
 {
-	CONFI_ERR_FILE_NOT_OPEN = 1,				/* Невозможно открыть файл */
+	CONFI_SUCCESS,								/* Ура */
+	CONFI_ERR_FILE_NOT_OPEN,					/* Невозможно открыть файл */
 	CONFI_ERR_FILE_NOT_FILE,					/* Указан не файл */
 	CONFI_ERR_FILE_MAX_SIZE,					/* Большой размер файла */
 	CONFI_ERR_FILE_EMPTY,						/* Для файла указана пустая строка */
@@ -71,7 +72,7 @@ enum confi_err_code
 struct confi_err
 {
 	enum confi_err_code code;
-	char name[1024];
+	char param[2][1024];
 	char message[2048];
 };
 

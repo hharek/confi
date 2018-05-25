@@ -11,8 +11,8 @@
 #include <sys/stat.h>
 
 #include "confi.h"
-#include "error.h"
-#include "error.c"
+#include "err.h"
+#include "err.c"
 
 /**
  * Проверить файл
@@ -22,7 +22,7 @@ int confi_file_check (const char * file, FILE ** fp)
 	/* Пустая строка */
 	if (file == NULL || *file == '\0')
 	{
-		return error (CONFI_ERR_FILE_EMPTY, "Файл не указан", NULL);
+		return err (CONFI_ERR_FILE_EMPTY, "Файл не указан", NULL);
 	}
 
 	/* Текушая папка */
@@ -38,7 +38,7 @@ int confi_file_check (const char * file, FILE ** fp)
 	*fp = fopen (path, "r");
 	if (!*fp)
 	{
-		return error (CONFI_ERR_FILE_NOT_OPEN, "Невозможно открыть файл «%s».", file);
+		return err (CONFI_ERR_FILE_NOT_OPEN, "Невозможно открыть файл «%s».", file);
 	}
 
 	/* Статистика по файлу */
@@ -48,13 +48,13 @@ int confi_file_check (const char * file, FILE ** fp)
 	/* Указан не файл */
 	if (!S_ISREG (st.st_mode))
 	{
-		return error (CONFI_ERR_FILE_NOT_FILE, "«%s» не является файлом.", file);
+		return err (CONFI_ERR_FILE_NOT_FILE, "«%s» не является файлом.", file);
 	}
 
 	/* Превышение размера */
 	if (st.st_size > CONFI_FILE_MAX_SIZE)
 	{
-		return error (CONFI_ERR_FILE_MAX_SIZE, "Размер файла не должен превышать «%d» байт.", (int)CONFI_FILE_MAX_SIZE);
+		return err (CONFI_ERR_FILE_MAX_SIZE, "Размер файла не должен превышать «%d» байт.", (int)CONFI_FILE_MAX_SIZE);
 	}
 
 	/* Бинарный файл */
@@ -65,7 +65,7 @@ int confi_file_check (const char * file, FILE ** fp)
 
 		if (ch == '\0')
 		{
-			return error (CONFI_ERR_FILE_NO_TEXT, "Файл «%s» не является текстовым.", file);
+			return err (CONFI_ERR_FILE_NO_TEXT, "Файл «%s» не является текстовым.", file);
 		}
 	}
 	while (ch != EOF);
@@ -86,14 +86,14 @@ int confi_params_check (struct confi_param * params)
 		char ch = name[0];
 		if (!isalpha (ch) && ch != '_')
 		{
-			return error (CONFI_ERR_PARAM_NAME_FIRST_BAD_SYMBOL, "Параметр «%s» имеет недопустимые символы. Название параметра может начинатся с символа: «a-z», «_»", param->name);
+			return err (CONFI_ERR_PARAM_NAME_FIRST_BAD_SYMBOL, "Параметр «%s» имеет недопустимые символы. Название параметра может начинатся с символа: «a-z», «_»", param->name);
 		}
 
 		while ((ch = *(name++)) != '\0')
 		{
 			if (!isalnum (ch) && ch != '-' && ch != '_')
 			{
-				return error (CONFI_ERR_PARAM_NAME_BAD_SYMBOL, "Параметр «%s» имеет недопустимые символы. Допускается: «a-z», «-», «_»", param->name);
+				return err (CONFI_ERR_PARAM_NAME_BAD_SYMBOL, "Параметр «%s» имеет недопустимые символы. Допускается: «a-z», «-», «_»", param->name);
 			}
 		}
 

@@ -5,8 +5,8 @@
 
 #include "confi.h"
 #include "value.h"
-#include "error.h"
-#include "error.c"
+#include "err.h"
+#include "err.c"
 
 /**
  * Проверить строку на соответствие типу и назначить по адресу
@@ -38,7 +38,7 @@ int value_set_int (struct confi_param * param)
 	strtol (param->value, &end, 0);
 	if (*end)
 	{
-		return error (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом.", param->name);
 	}
 
 	if (param->ptr != NULL)
@@ -59,7 +59,7 @@ int value_set_double (struct confi_param * param)
 	strtod (param->value, &end);
 	if (*end)
 	{
-		return error (CONFI_ERR_VALUE_NOT_DOUBLE, "Параметр «%s» не является числом с плавающей запятой.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_DOUBLE, "Параметр «%s» не является числом с плавающей запятой.", param->name);
 	}
 
 	if (param->ptr != NULL)
@@ -78,7 +78,7 @@ int value_set_string (struct confi_param * param)
 {
 	if (strlen (param->value) > 1024)
 	{
-		return error (CONFI_ERR_VALUE_BIG_STRING, "Параметр «%s» содержит слишком длинную строку.", param->name);
+		return err (CONFI_ERR_VALUE_BIG_STRING, "Параметр «%s» содержит слишком длинную строку.", param->name);
 	}
 
 	if (param->ptr != NULL)
@@ -106,7 +106,7 @@ int value_set_bool (struct confi_param * param)
 		strcmp (param->value, "off") != 0
 	)
 	{
-		return error (CONFI_ERR_VALUE_NOT_BOOLEAN, "Параметр «%s» не является булёвым значением. Допустимые значения «1, 0, true, false, yes, no, on, off»", param->name);
+		return err (CONFI_ERR_VALUE_NOT_BOOLEAN, "Параметр «%s» не является булёвым значением. Допустимые значения «1, 0, true, false, yes, no, on, off»", param->name);
 	}
 
 	if (param->ptr != NULL)
