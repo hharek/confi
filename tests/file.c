@@ -69,5 +69,7 @@ bool test_file_big_size ()
 
 bool test_file_no_text ()
 {
+
+
 	return true;
 }

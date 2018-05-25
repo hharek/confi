@@ -48,8 +48,6 @@ int confi (const char * file, struct confi_param * params)
 
 	/* Закрыть файл */
     fclose (fp);
-
-	return 0;
 }
 
 /**
@@ -125,9 +123,9 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	{
 		if (param->value != NULL)
 		{
-			if (value_set (param) == -1)
+			if (value_set (param) != 0)
 			{
-				return -1;
+				return err_mess.code;
 			}
 		}
 
@@ -140,5 +138,5 @@ int confi_parse_string (const char * str, struct confi_param * params)
  */
 struct confi_err * confi_err ()
 {
-	return &err;
+	return &err_mess;
 }

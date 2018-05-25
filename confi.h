@@ -72,7 +72,7 @@ enum confi_err_code
 struct confi_err
 {
 	enum confi_err_code code;
-	char param[2][1024];
+	char param[1024];
 	char message[2048];
 };
 

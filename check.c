@@ -54,7 +54,9 @@ int confi_file_check (const char * file, FILE ** fp)
 	/* Превышение размера */
 	if (st.st_size > CONFI_FILE_MAX_SIZE)
 	{
-		return err (CONFI_ERR_FILE_MAX_SIZE, "Размер файла не должен превышать «%d» байт.", (int)CONFI_FILE_MAX_SIZE);
+		char max_size[16];
+		sprintf (max_size, "%d", CONFI_FILE_MAX_SIZE);
+		return err (CONFI_ERR_FILE_MAX_SIZE, "Размер файла не должен превышать «%s» байт.", max_size);
 	}
 
 	/* Бинарный файл */
