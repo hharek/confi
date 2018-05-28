@@ -3,11 +3,20 @@
 
 #include "../confi.h"
 
+/* Параметры */
+static struct confi_param confi_params_min[] =
+{
+	{.name = "param", .type = CONFI_TYPE_INT},
+	NULL
+};
+
 static bool test_file_not_found ();
 static bool test_file_not_file ();
 static bool test_file_empty ();
 static bool test_file_big_size ();
 static bool test_file_no_text ();
+static bool test_file_random_string ();
+static bool test_file_content_empty ();
 
 /**
  * Указан несуществующий файл
@@ -93,19 +102,70 @@ bool test_file_no_text ()
 	int size = 100;
 	for (int i = 0; i < size; i++)
 	{
+		/* Вставляем нулёвые символы */
+		if ((i % 10) == 0)
+		{
+			fputc (0, fp);
+		}
 		fputc ((int)random (), fp);
 	}
-
 	fclose (fp);
 
 	/* Передаём функции */
-	if (confi (file, NULL) != CONFI_ERR_FILE_NO_TEXT)
+	if (confi (file, confi_params_min) != CONFI_ERR_FILE_NO_TEXT)
 	{
 		return false;
 	}
 
 	/* Удаляем старый файл */
 	remove (file);
+
+	return true;
+}
+
+/**
+ * Случайная строка
+ */
+static bool test_file_random_string ()
+{
+	if (confi_parse_string ("random_string", confi_params_min) != CONFI_ERR_TOKEN_ORDER)
+	{
+		return false;
+	}
+
+	if (confi_parse_string ("param1 param2 param3", confi_params_min) != CONFI_ERR_TOKEN_ORDER)
+	{
+		return false;
+	}
+
+	if (confi_parse_string ("param=10", confi_params_min) != CONFI_ERR_TOKEN_ORDER)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Случайная строка
+ */
+static bool test_file_content_empty ()
+{
+	static struct confi_param confi_params_require[] =
+	{
+		{.name = "param", .type = CONFI_TYPE_INT, .require = true},
+		NULL
+	};
+
+	if (confi_parse_string ("", confi_params_require) != CONFI_ERR_FILE_EMPTY_CONTENT)
+	{
+		return false;
+	}
+
+	if (confi_parse_string ("", confi_params_min) != 0)
+	{
+		return false;
+	}
 
 	return true;
 }

@@ -20,7 +20,8 @@ struct token * token_parse_string (const char * str)
 	char ch;
 	char * pos = (char *)str;
 
-	while ((ch = *(pos++)) != '\0')
+	ch = *(pos++);
+	while (1)
 	{
 		switch (token_type)
 		{
@@ -66,20 +67,20 @@ struct token * token_parse_string (const char * str)
 			}
 			break;
 		}
+
+		if (ch == '\0')
+		{
+			break;
+		}
+
+		ch = *(pos++);
 	}
 
 	/* Проверяем порядок следования токенов */
-	if (token_check_order (tokens) == -1)
+	if (token_check_order (tokens) != 0)
 	{
 		return NULL;
 	}
-
-//	struct token * i = tokens;
-//	while (i != NULL)
-//	{
-//		printf ("%s\n", i->content);
-//		i = i->next;
-//	}
 
 	return tokens;
 }
@@ -93,7 +94,7 @@ int token_blank (char ch, struct token ** tokens)
 	{
 		return TOKEN_COMMENT;
 	}
-	else if (isblank (ch) || ch == '\r' || ch == '\n')
+	else if (isblank (ch) || ch == '\r' || ch == '\n' || ch == '\0')
 	{
 		return TOKEN_BLANK;
 	}
@@ -146,7 +147,7 @@ int token_word (char ch, struct token ** tokens)
 	static char         buf[TOKEN_BUF_MAX_SIZE + 1] = {'\0'};
 	static unsigned int buf_size = 0;
 
-	if (isblank (ch) || ch == '\r' || ch == '\n' || ch == '=' || ch == ';')
+	if (isblank (ch) || ch == '\r' || ch == '\n' || ch == '=' || ch == ';' || ch == '\0')
 	{
 		buf[buf_size] = '\0';
 		buf_size = 0;

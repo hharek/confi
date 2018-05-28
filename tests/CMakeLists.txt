@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(confi_tests_SOURCE_FILES
         ../confi.h
         file.c
+        params.c
         main.c)
 
 add_executable(tests ${confi_tests_SOURCE_FILES})

@@ -54,6 +54,8 @@ enum confi_err_code
 	CONFI_ERR_FILE_MAX_SIZE,					/* Большой размер файла */
 	CONFI_ERR_FILE_EMPTY,						/* Для файла указана пустая строка */
 	CONFI_ERR_FILE_NO_TEXT,						/* Файл не является текстовым */
+	CONFI_ERR_FILE_EMPTY_CONTENT,				/* Пустой файл */
+	CONFI_ERR_PARAMS_NULL,						/* Не заданы параметры */
 	CONFI_ERR_PARAM_REPEAT,						/* Параметр повторяется */
 	CONFI_ERR_PARAM_REQUIRE,					/* Отсутствует обязательный параметр */
 	CONFI_ERR_PARAM_UNKNOWN,					/* Неизвестный параметр */

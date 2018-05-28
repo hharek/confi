@@ -18,6 +18,8 @@
  */
 int confi (const char * file, struct confi_param * params)
 {
+	confi_err ()->code = CONFI_SUCCESS;
+
 	FILE * fp;
 	int result = 0;
 
@@ -31,13 +33,6 @@ int confi (const char * file, struct confi_param * params)
 	/* Читаем файл */
 	char content[CONFI_FILE_MAX_SIZE + 1];
 	fread (content, CONFI_FILE_MAX_SIZE, 1, fp);
-
-	/* Проверка параметров */
-	result = confi_params_check (params);
-	if (result != 0)
-	{
-		return result;
-	}
 
 	/* Парсим */
 	result = confi_parse_string (content, params);
@@ -55,11 +50,45 @@ int confi (const char * file, struct confi_param * params)
  */
 int confi_parse_string (const char * str, struct confi_param * params)
 {
+	confi_err ()->code = CONFI_SUCCESS;
+
+	/* Проверка параметров */
+	int result = confi_params_check (params);
+	if (result != 0)
+	{
+		return result;
+	}
+
 	/* Разбираем строку на токены */
 	struct token * tokens = token_parse_string (str);
-	if (tokens == NULL)
+
+	/* Ошибка при парсинге токена */
+	if (confi_err ()->code != CONFI_SUCCESS)
 	{
 		return confi_err ()->code;
+	}
+
+	/* Проверяем возможность пустого файла */
+	if (tokens == NULL)
+	{
+		struct confi_param * param = params;
+
+		bool require = false;
+		while (param->name != NULL)
+		{
+			if (param->require)
+			{
+				require = true;
+				break;
+			}
+
+			param++;
+		}
+
+		if (require)
+		{
+			return err (CONFI_ERR_FILE_EMPTY_CONTENT, "Пустой файл", NULL);
+		}
 	}
 
 	/* Заполняем значениями параметры */

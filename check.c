@@ -81,6 +81,11 @@ int confi_file_check (const char * file, FILE ** fp)
  */
 int confi_params_check (struct confi_param * params)
 {
+	if (params == NULL)
+	{
+		return err (CONFI_ERR_PARAMS_NULL, "Не заданы параметры", NULL);
+	}
+
 	struct confi_param * param = params;
 	while (param->name != NULL)
 	{
