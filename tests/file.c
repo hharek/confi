@@ -126,7 +126,7 @@ bool test_file_no_text ()
 /**
  * Случайная строка
  */
-static bool test_file_random_string ()
+bool test_file_random_string ()
 {
 	if (confi_parse_string ("random_string", confi_params_min) != CONFI_ERR_TOKEN_ORDER)
 	{
@@ -147,9 +147,9 @@ static bool test_file_random_string ()
 }
 
 /**
- * Случайная строка
+ * Пустой файл
  */
-static bool test_file_content_empty ()
+bool test_file_content_empty ()
 {
 	static struct confi_param confi_params_require[] =
 	{

@@ -15,6 +15,8 @@
  */
 struct token * token_parse_string (const char * str)
 {
+	token_type = TOKEN_BLANK;
+	token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
 	struct token * tokens = NULL;
 
 	char ch;

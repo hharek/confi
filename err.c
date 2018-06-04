@@ -13,7 +13,6 @@ enum confi_err_code err (enum confi_err_code code, const char * format, const ch
 {
 	err_mess.code = code;
 
-
  	if (param != NULL)
 	{
 		strncpy (err_mess.param, param, 1024);
@@ -23,7 +22,6 @@ enum confi_err_code err (enum confi_err_code code, const char * format, const ch
 	{
 		strncpy (err_mess.message, format, 2048);
 	}
-
 
 	return code;
 }

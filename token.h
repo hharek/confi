@@ -2,7 +2,7 @@
 
 /*** Данные и структуры ***/
 /* Структура токенов */
-static struct token
+struct token
 {
 	int type;
 	char * content;
@@ -11,7 +11,7 @@ static struct token
 };
 
 /* Типы токенов */
-static enum
+enum
 {
 	TOKEN_BLANK,
 	TOKEN_WORD,
@@ -24,13 +24,13 @@ static enum
 static int token_type = TOKEN_BLANK;
 
 /* Максимальные и минимальные значения */
-static enum
+enum
 {
 	TOKEN_BUF_MAX_SIZE = 1024
 };
 
 /* Строки */
-static enum
+enum
 {
 	TOKEN_STRING_QUOTES_DOUBLE,
 	TOKEN_STRING_QUOTES_SINGLE

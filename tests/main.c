@@ -2,7 +2,9 @@
 
 #include "../confi.h"
 #include "file.c"
-#include "params.c"
+#include "param.c"
+#include "token.c"
+#include "value.c"
 
 int main ()
 {
@@ -17,7 +19,21 @@ int main ()
 	if (!test_file_content_empty ())		{ fprintf (stderr, "test_file_content_empty");	}
 
 	/* Параметры */
-	if (!test_params_null ())				{ fprintf (stderr, "test_params_null"); 		}
+	if (!test_params_null ())					{ fprintf (stderr, "test_params_null"); 			}
+	if (!test_params_name_first_bad_symbol())	{ fprintf (stderr, "test_params_first_bad_symbol"); }
+	if (!test_params_name_bad_symbol())			{ fprintf (stderr, "test_params_name_bad_symbol");	}
+	if (!test_params_repeat ())					{ fprintf (stderr, "test_params_repeat");			}
+	if (!test_params_require ())				{ fprintf (stderr, "test_params_require");			}
+	if (!test_params_unknown ())				{ fprintf (stderr, "test_params_unknown");			}
+
+	/* Токены */
+	if (!test_token_order ())				{ fprintf (stderr, "test_token_order");	}
+
+	/* Значения */
+	if (!test_value_not_int ())				{ fprintf (stderr, "test_value_not_int");		}
+//	if (!test_value_not_double ())			{ fprintf (stderr, "test_value_not_double");	}
+//	if (!test_value_not_boolean ())			{ fprintf (stderr, "test_value_not_boolean");	}
+//	if (!test_value_big_string ())			{ fprintf (stderr, "test_value_big_string");	}
 
 	return 0;
 }

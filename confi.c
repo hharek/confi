@@ -51,6 +51,7 @@ int confi (const char * file, struct confi_param * params)
 int confi_parse_string (const char * str, struct confi_param * params)
 {
 	confi_err ()->code = CONFI_SUCCESS;
+	confi_err ()->message[0] = '\0';
 
 	/* Проверка параметров */
 	int result = confi_params_check (params);
@@ -62,7 +63,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	/* Разбираем строку на токены */
 	struct token * tokens = token_parse_string (str);
 
-	/* Ошибка при парсинге токена */
+	/* Ошибка при разборе строки на токены */
 	if (confi_err ()->code != CONFI_SUCCESS)
 	{
 		return confi_err ()->code;
