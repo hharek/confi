@@ -88,13 +88,25 @@ bool test_value_not_boolean ()
  */
 bool test_value_big_string ()
 {
+	/* Создаём строку типа param = "aaa...";*/
+	char str[CONFI_VALUE_STRING_MAX_LENGTH + 10] = "param = ";
+	char string[CONFI_VALUE_STRING_MAX_LENGTH + 1 + 1];
+
+	memset (string, 'a', CONFI_VALUE_STRING_MAX_LENGTH + 1);
+	string[CONFI_VALUE_STRING_MAX_LENGTH + 1] = '\0';
+
+	strcat (str, "\"");
+	strcat (str, string);
+	strcat (str, "\";");
+
+	/* Запускаем */
 	struct confi_param confi_params[] =
 	{
 		{ .name = "param", .type = CONFI_TYPE_STRING	},
 		NULL
 	};
 
-	if (confi_parse_string ("param = 100;", confi_params) != CONFI_ERR_VALUE_BIG_STRING)
+	if (confi_parse_string (str, confi_params) != CONFI_ERR_VALUE_BIG_STRING)
 	{
 		return false;
 	}

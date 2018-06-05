@@ -31,9 +31,9 @@ int main ()
 
 	/* Значения */
 	if (!test_value_not_int ())				{ fprintf (stderr, "test_value_not_int");		}
-//	if (!test_value_not_double ())			{ fprintf (stderr, "test_value_not_double");	}
-//	if (!test_value_not_boolean ())			{ fprintf (stderr, "test_value_not_boolean");	}
-//	if (!test_value_big_string ())			{ fprintf (stderr, "test_value_big_string");	}
+	if (!test_value_not_double ())			{ fprintf (stderr, "test_value_not_double");	}
+	if (!test_value_not_boolean ())			{ fprintf (stderr, "test_value_not_boolean");	}
+	if (!test_value_big_string ())			{ fprintf (stderr, "test_value_big_string");	}
 
 	return 0;
 }

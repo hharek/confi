@@ -21,8 +21,6 @@ enum
 	TOKEN_SEMICOLON
 };
 
-static int token_type = TOKEN_BLANK;
-
 /* Максимальные и минимальные значения */
 enum
 {
@@ -35,8 +33,6 @@ enum
 	TOKEN_STRING_QUOTES_DOUBLE,
 	TOKEN_STRING_QUOTES_SINGLE
 };
-
-static int token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
 
 /*** Прототипы функций ***/
 static struct token * token_parse_string (const char * str);

@@ -76,7 +76,7 @@ int value_set_double (struct confi_param * param)
  */
 int value_set_string (struct confi_param * param)
 {
-	if (strlen (param->value) > 1024)
+	if (strlen (param->value) > CONFI_VALUE_STRING_MAX_LENGTH)
 	{
 		return err (CONFI_ERR_VALUE_BIG_STRING, "Параметр «%s» содержит слишком длинную строку.", param->name);
 	}

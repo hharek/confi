@@ -10,6 +10,9 @@
 #include "err.h"
 #include "err.c"
 
+static int token_type = TOKEN_BLANK;
+static int token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
+
 /**
  * Разбираем файл на токены
  */
@@ -223,6 +226,7 @@ void token_push (int type, char * content, struct token ** tokens)
 	struct token * next = malloc (sizeof (struct token));
 	next->type = type;
 	next->content = content;
+	next->next = NULL;
 
 	/* Первый элемент */
 	if (* tokens == NULL)
