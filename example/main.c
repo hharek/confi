@@ -14,6 +14,7 @@ int main()
 		int param_min;
 		char * param_string1;
 		char * param_string2;
+		char * param_string3;
 		bool param_boolean1;
 		bool param_boolean2;
 		char * param_default;
@@ -29,11 +30,12 @@ int main()
 		{ .name = "param_min",		.type = CONFI_TYPE_INT,		.ptr = &params.param_min 												},
 		{ .name = "param_string1",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string1											},
 		{ .name = "param_string2",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string2 											},
+		{ .name = "param_string3",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string3 											},
 		{ .name = "param_boolean1",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean1 											},
 		{ .name = "param_boolean2",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean2, 	.require = true							},
 		{ .name = "param_default",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_default,					.value = "test_default" },
 		{ .name = "param_repeat",	.type = CONFI_TYPE_INT,		.ptr = &params.param_repeat												},
-		{ .name = "param_string",	.type = CONFI_TYPE_STRING																			},
+
 		NULL
 	};
 
@@ -51,6 +53,7 @@ int main()
 	printf ("param_min = %d\n", params.param_min);
 	printf ("param_string1 = %s\n", params.param_string1);
 	printf ("param_string2 = %s\n", params.param_string2);
+	printf ("param_string3 = %s\n", params.param_string3);
 	printf ("param_boolean1 = %d\n", params.param_boolean1);
 	printf ("param_boolean2 = %d\n", params.param_boolean2);
 	printf ("param_default = %s\n", params.param_default);

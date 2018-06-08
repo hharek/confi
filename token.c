@@ -10,16 +10,19 @@
 #include "err.h"
 #include "err.c"
 
-static int token_type = TOKEN_BLANK;
-static int token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
-
 /**
  * Разбираем файл на токены
  */
 struct token * token_parse_string (const char * str)
 {
+	static int token_type;
+	static char         buf[TOKEN_BUF_MAX_SIZE + 1];
+	static unsigned int buf_size;
+
 	token_type = TOKEN_BLANK;
-	token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
+	buf[0] = '\0';
+	buf_size = 0;
+
 	struct token * tokens = NULL;
 
 	char ch;
@@ -33,42 +36,42 @@ struct token * token_parse_string (const char * str)
 			/* Код */
 			case TOKEN_BLANK:
 			{
-				token_type = token_blank (ch, &tokens);
+				token_type = token_blank (ch, buf, &buf_size, &tokens);
 			}
 			break;
 
 			/* Комментарий */
 			case TOKEN_COMMENT:
 			{
-				token_type = token_comment (ch, &tokens);
+				token_type = token_comment (ch, buf, &buf_size, &tokens);
 			}
 			break;
 
 			/* Идентификатор */
 			case TOKEN_WORD:
 			{
-				token_type = token_word (ch, &tokens);
+				token_type = token_word (ch, buf, &buf_size, &tokens);
 			}
 			break;
 
-			/* Строка */
-			case TOKEN_STRING:
+			/* Строка в одинарных кавычках */
+			case TOKEN_STRING_QUOTES_SINGLE:
 			{
-				token_type = token_string (ch, &tokens);
+				token_type = token_string_quotes_single (ch, buf, &buf_size, &tokens);
 			}
 			break;
 
-			/* Знак «=» */
-			case TOKEN_EQUAL:
+			/* Строка в двойных кавычках */
+			case TOKEN_STRING_QUOTES_DOUBLE:
 			{
-				token_type = token_equal (ch, &tokens);
+				token_type = token_string_quotes_double (ch, buf, &buf_size, &tokens);
 			}
 			break;
 
-			/* Знак «;» */
-			case TOKEN_SEMICOLON:
+			/* Строка в двойных кавычках. Экранирование */
+			case TOKEN_STRING_QUOTES_DOUBLE_ESCAPE:
 			{
-				token_type = token_semicolon (ch, &tokens);
+				token_type = token_string_quotes_double_escape (ch, buf, &buf_size, &tokens);
 			}
 			break;
 		}
@@ -81,11 +84,11 @@ struct token * token_parse_string (const char * str)
 		ch = *(pos++);
 	}
 
-	/* Проверяем порядок следования токенов */
-	if (token_check_order (tokens) != 0)
-	{
-		return NULL;
-	}
+//	/* Проверяем порядок следования токенов */
+//	if (token_check_order (tokens) != 0)
+//	{
+//		return NULL;
+//	}
 
 	return tokens;
 }
@@ -93,7 +96,7 @@ struct token * token_parse_string (const char * str)
 /**
  * Токен «код»
  */
-int token_blank (char ch, struct token ** tokens)
+int token_blank (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
 {
 	if (ch == '#')
 	{
@@ -105,34 +108,30 @@ int token_blank (char ch, struct token ** tokens)
 	}
 	else if (ch == '=')
 	{
-		return token_equal (ch, tokens);
+		return token_equal (tokens);
 	}
 	else if (ch == ';')
 	{
-		return token_semicolon (ch, tokens);
-	}
-	else if (ch == '"')
-	{
-		token_string_type = TOKEN_STRING_QUOTES_DOUBLE;
-
-		return TOKEN_STRING;
+		return token_semicolon (tokens);
 	}
 	else if (ch == '\'')
 	{
-		token_string_type = TOKEN_STRING_QUOTES_SINGLE;
-
-		return TOKEN_STRING;
+		return TOKEN_STRING_QUOTES_SINGLE;
+	}
+	else if (ch == '"')
+	{
+		return TOKEN_STRING_QUOTES_DOUBLE;
 	}
 	else
 	{
-		return token_word (ch, tokens);
+		return token_word (ch, buf, buf_size, tokens);
 	}
 }
 
 /**
  * Токен «комментарий»
  */
-int token_comment (char ch, struct token ** tokens)
+int token_comment (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
 {
 	if (ch == '\n')
 	{
@@ -147,61 +146,128 @@ int token_comment (char ch, struct token ** tokens)
 /**
  * Токен «слово»
  */
-int token_word (char ch, struct token ** tokens)
+int token_word (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
 {
-	static char         buf[TOKEN_BUF_MAX_SIZE + 1] = {'\0'};
-	static unsigned int buf_size = 0;
-
 	if (isblank (ch) || ch == '\r' || ch == '\n' || ch == '=' || ch == ';' || ch == '\0')
 	{
-		buf[buf_size] = '\0';
-		buf_size = 0;
+		buf[*buf_size] = '\0';
+		*buf_size = 0;
 		token_push (TOKEN_WORD, strdup (buf), tokens);
 
-		return token_blank (ch, tokens);
+		return token_blank (ch, buf, buf_size, tokens);
 	}
 	else
 	{
-		buf[buf_size] = ch;
-		buf_size++;
+		buf[*buf_size] = ch;
+		(*buf_size)++;
 
 		return TOKEN_WORD;
 	}
 }
 
 /**
- * Токен «строка»
+ * Токен «строка» в одинарных кавычках
  */
-int token_string (char ch, struct token ** tokens)
+int token_string_quotes_single (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
 {
-	static char         buf[TOKEN_BUF_MAX_SIZE + 1] = {'\0'};
-	static unsigned int buf_size = 0;
-
-	if
-	(
-		(token_string_type == TOKEN_STRING_QUOTES_DOUBLE && ch == '"') ||
-		(token_string_type == TOKEN_STRING_QUOTES_SINGLE && ch == '\'')
-	)
+	if (ch == '\'')
 	{
-		buf[buf_size] = '\0';
-		buf_size = 0;
+		buf[*buf_size] = '\0';
+		*buf_size = 0;
 		token_push (TOKEN_STRING, strdup (buf), tokens);
 
 		return TOKEN_BLANK;
 	}
 	else
 	{
-		buf[buf_size] = ch;
-		buf_size++;
+		buf[*buf_size] = ch;
+		(*buf_size)++;
 
-		return TOKEN_STRING;
+		return TOKEN_STRING_QUOTES_SINGLE;
 	}
+}
+
+/**
+ * Токен «строка» в двойных кавычках
+ */
+int token_string_quotes_double (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
+{
+	if (ch == '"')
+	{
+		buf[*buf_size] = '\0';
+		*buf_size = 0;
+		token_push (TOKEN_STRING, strdup (buf), tokens);
+
+		return TOKEN_BLANK;
+	}
+	else if (ch == '\\')
+	{
+		return TOKEN_STRING_QUOTES_DOUBLE_ESCAPE;
+	}
+	else
+	{
+		buf[*buf_size] = ch;
+		(*buf_size)++;
+
+		return TOKEN_STRING_QUOTES_DOUBLE;
+	}
+}
+
+/**
+ * Токен «строка» в двойных кавычках. Экранирование
+ */
+int token_string_quotes_double_escape (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
+{
+	if (ch == 'n' || ch == 'r' || ch == 't' || ch == 'v' || ch == 'e' || ch == 'f' || ch == '\\' || ch == '"')
+	{
+		char symbol = '\0';
+		switch (ch)
+		{
+			case 'n':
+				symbol = '\n';
+				break;
+			case 'r':
+				symbol = '\r';
+				break;
+			case 't':
+				symbol = '\t';
+				break;
+			case 'v':
+				symbol = '\v';
+				break;
+			case 'e':
+				symbol = 0x1B;		// escape знак
+				break;
+			case 'f':
+				symbol = '\f';
+				break;
+			case '\\':
+				symbol = '\\';
+				break;
+			case '"':
+				symbol = '"';
+				break;
+		}
+
+		buf[*buf_size] = symbol;
+		(*buf_size)++;
+	}
+	else
+	{
+		buf[*buf_size] = '\\';
+		(*buf_size)++;
+
+		buf[*buf_size] = ch;
+		(*buf_size)++;
+	}
+
+	return TOKEN_STRING_QUOTES_DOUBLE;
 }
 
 /**
  * Токен «=»
  */
-int token_equal (char ch, struct token ** tokens)
+int token_equal (struct token ** tokens)
 {
 	token_push (TOKEN_EQUAL, strdup ("="), tokens);
 
@@ -211,7 +277,7 @@ int token_equal (char ch, struct token ** tokens)
 /**
  * Токен «;»
  */
-int token_semicolon (char ch, struct token ** tokens)
+int token_semicolon (struct token ** tokens)
 {
 	token_push (TOKEN_SEMICOLON, strdup (";"), tokens);
 
