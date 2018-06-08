@@ -33,6 +33,7 @@ int main()
 		{ .name = "param_boolean2",	.type = CONFI_TYPE_BOOLEAN,	.ptr = &params.param_boolean2, 	.require = true							},
 		{ .name = "param_default",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_default,					.value = "test_default" },
 		{ .name = "param_repeat",	.type = CONFI_TYPE_INT,		.ptr = &params.param_repeat												},
+		{ .name = "param_string",	.type = CONFI_TYPE_STRING																			},
 		NULL
 	};
 

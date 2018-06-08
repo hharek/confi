@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../confi.h"
+#include "../../confi.h"
 
 /* Параметры */
 static struct confi_param confi_params_min[] =

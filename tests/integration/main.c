@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../confi.h"
+#include "../../confi.h"
 #include "file.c"
 #include "param.c"
 #include "token.c"

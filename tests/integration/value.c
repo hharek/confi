@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../confi.h"
+#include "../../confi.h"
 
 static bool test_value_not_int ();
 static bool test_value_not_double ();

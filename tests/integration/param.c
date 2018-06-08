@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../confi.h"
+#include "../../confi.h"
 
 static bool test_params_null ();
 static bool test_params_name_first_bad_symbol ();
