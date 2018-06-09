@@ -6,34 +6,77 @@
 #include "token.c"
 #include "value.c"
 
+/**
+ * Структура для тестов
+ */
+struct itest
+{
+	char * name;
+	bool (*func) ();
+};
+
+/**
+ * Выполнение интеграционных тестов
+ */
+void integration_tests (struct itest * tests);
+
 int main ()
 {
-	/* Проверка файла */
-	if (!test_file_not_found ())			{ fprintf (stderr, "test_file_not_found"); 		}
-	if (!test_file_not_file ())				{ fprintf (stderr, "test_file_not_file"); 		}
-	if (!test_file_empty ())				{ fprintf (stderr, "test_file_empty"); 			}
-	if (!test_file_big_size ())				{ fprintf (stderr, "test_file_big_size"); 		}
-	if (!test_file_not_file ())				{ fprintf (stderr, "test_file_not_file"); 		}
-	if (!test_file_no_text ())				{ fprintf (stderr, "test_file_no_text"); 		}
-	if (!test_file_random_string ())		{ fprintf (stderr, "test_file_random_string");	}
-	if (!test_file_content_empty ())		{ fprintf (stderr, "test_file_content_empty");	}
+	struct itest tests[] =
+	{
+		/* Проверка файла */
+		{ .name = "file_not_found", 				.func = test_file_not_found 				},
+		{ .name = "file_not_file", 					.func = test_file_not_file 					},
+		{ .name = "file_empty", 					.func = test_file_empty 					},
+		{ .name = "file_big_size", 					.func = test_file_big_size 					},
+		{ .name = "file_not_file", 					.func = test_file_not_file 					},
+		{ .name = "file_no_text", 					.func = test_file_no_text 					},
+		{ .name = "file_random_string", 			.func = test_file_random_string				},
+		{ .name = "file_content_empty", 			.func = test_file_content_empty 			},
 
-	/* Параметры */
-	if (!test_params_null ())					{ fprintf (stderr, "test_params_null"); 			}
-	if (!test_params_name_first_bad_symbol())	{ fprintf (stderr, "test_params_first_bad_symbol"); }
-	if (!test_params_name_bad_symbol())			{ fprintf (stderr, "test_params_name_bad_symbol");	}
-	if (!test_params_repeat ())					{ fprintf (stderr, "test_params_repeat");			}
-	if (!test_params_require ())				{ fprintf (stderr, "test_params_require");			}
-	if (!test_params_unknown ())				{ fprintf (stderr, "test_params_unknown");			}
+		/* Параметры */
+		{ .name = "params_null", 					.func = test_params_null 					},
+		{ .name = "params_name_first_bad_symbol", 	.func = test_params_name_first_bad_symbol 	},
+		{ .name = "params_name_bad_symbol", 		.func = test_params_name_bad_symbol 		},
+		{ .name = "params_repeat", 					.func = test_params_repeat					},
+		{ .name = "params_require", 				.func = test_params_require 				},
+		{ .name = "params_unknown", 				.func = test_params_unknown 				},
 
-	/* Токены */
-	if (!test_token_order ())				{ fprintf (stderr, "test_token_order");	}
+		/* Токены */
+		{ .name = "token_order", 					.func = test_token_order 					},
 
-	/* Значения */
-	if (!test_value_not_int ())				{ fprintf (stderr, "test_value_not_int");		}
-	if (!test_value_not_double ())			{ fprintf (stderr, "test_value_not_double");	}
-	if (!test_value_not_boolean ())			{ fprintf (stderr, "test_value_not_boolean");	}
-	if (!test_value_big_string ())			{ fprintf (stderr, "test_value_big_string");	}
+		/* Значения */
+		{ .name = "value_not_int", 					.func = test_value_not_int 					},
+		{ .name = "value_not_double", 				.func = test_value_not_double 				},
+		{ .name = "value_not_boolean", 				.func = test_value_not_boolean 				},
+		{ .name = "value_big_string", 				.func = test_value_big_string 				},
+		NULL
+	};
+
+	/* Запускаем тесты */
+	integration_tests (tests);
 
 	return 0;
+}
+
+
+void integration_tests (struct itest * tests)
+{
+	struct itest * t = tests;
+	while (t->name != NULL)
+	{
+
+		if (t->func())
+		{
+			printf ("%s: Да.\n", t->name);
+			fflush (stdout);
+		}
+		else
+		{
+			fprintf (stderr, "%s: Нет.\n", t->name);
+			fflush (stderr);
+		}
+
+		t++;
+	}
 }

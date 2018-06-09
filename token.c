@@ -84,11 +84,11 @@ struct token * token_parse_string (const char * str)
 		ch = *(pos++);
 	}
 
-//	/* Проверяем порядок следования токенов */
-//	if (token_check_order (tokens) != 0)
-//	{
-//		return NULL;
-//	}
+	/* Проверяем порядок следования токенов */
+	if (token_check_order (tokens) != 0)
+	{
+		return NULL;
+	}
 
 	return tokens;
 }
