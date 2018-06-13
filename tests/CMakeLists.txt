@@ -3,5 +3,8 @@ project(confi_tests)
 
 set(CMAKE_C_STANDARD 11)
 
-add_subdirectory(integration)
-add_subdirectory(unit)
+# token.h
+add_executable(tests_token  ../confi.h
+                            tests.h
+                            tests.c
+                            token/main.c)

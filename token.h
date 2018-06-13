@@ -23,7 +23,7 @@ enum token_type
 	TOKEN_STRING,							/* Строка */
 	TOKEN_STRING_QUOTES_SINGLE,				/* Строка в одинарных кавычках */
 	TOKEN_STRING_QUOTES_DOUBLE,				/* Строка в двойных кавычках */
-	TOKEN_STRING_QUOTES_DOUBLE_ESCAPE		/* Символ экранирования */
+	TOKEN_STRING_QUOTES_DOUBLE_ESCAPE		/* Символ экранирования в двойных кавычках */
 };
 
 /* Максимальные и минимальные значения */
