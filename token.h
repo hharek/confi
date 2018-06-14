@@ -22,8 +22,9 @@ enum token_type
 	TOKEN_SEMICOLON,						/* Точка с запятой */
 	TOKEN_STRING,							/* Строка */
 	TOKEN_STRING_QUOTES_SINGLE,				/* Строка в одинарных кавычках */
+	TOKEN_STRING_QUOTES_SINGLE_ESCAPE,		/* Строка в одинарных кавычках. Символ экранирование */
 	TOKEN_STRING_QUOTES_DOUBLE,				/* Строка в двойных кавычках */
-	TOKEN_STRING_QUOTES_DOUBLE_ESCAPE		/* Символ экранирования в двойных кавычках */
+	TOKEN_STRING_QUOTES_DOUBLE_ESCAPE		/* Строка в двойных кавычках. Символ экранирование */
 };
 
 /* Максимальные и минимальные значения */
@@ -39,6 +40,7 @@ static int token_blank (char ch, char * buf, unsigned int * buf_size, struct tok
 static int token_comment (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_word (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_string_quotes_single (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
+static int token_string_quotes_single_escape (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_string_quotes_double (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_string_quotes_double_escape (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_equal (struct token ** tokens);

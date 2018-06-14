@@ -7,20 +7,23 @@
 /**
  * Выполнение тестов
  */
-int tests (struct test * tests)
+int tests (char * name, struct test * tests)
 {
+	printf ("%s:\n", name);
+	fflush (stdout);
+
 	struct test * t = tests;
 	while (t->name != NULL)
 	{
 
 		if (t->func())
 		{
-			printf ("%s: Да.\n", t->name);
+			printf ("\t- %s: Да.\n", t->name);
 			fflush (stdout);
 		}
 		else
 		{
-			fprintf (stdout, "%s: Нет.\n", t->name);
+			fprintf (stdout, "\t- %s: Нет.\n", t->name);
 			fflush (stdout);
 			return 1;
 		}

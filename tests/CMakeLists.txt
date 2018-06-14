@@ -7,4 +7,12 @@ set(CMAKE_C_STANDARD 11)
 add_executable(tests_token  ../confi.h
                             tests.h
                             tests.c
-                            token/main.c)
+                            token.c)
+
+
+# Запуск тестов
+add_custom_target(tests
+        COMMAND ./tests_token)
+add_dependencies(tests tests_token)
+
+

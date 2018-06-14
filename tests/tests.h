@@ -14,4 +14,4 @@ struct test
 /**
  * Выполнение тестов
  */
-static int tests (struct test * tests);
+static int tests (char * name, struct test * tests);

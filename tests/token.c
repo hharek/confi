@@ -2,27 +2,28 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "../tests.h"
-#include "../tests.c"
-#include "../../token.h"
-#include "../../token.c"
-
+#include "tests.h"
+#include "tests.c"
+#include "../token.h"
+#include "../token.c"
 
 static bool white_space ();					/* Проверка на пробельные символы */
 static bool string_quote ();				/* Строки в одинарных и двойных кавычках */
 static bool string_quote_escape ();			/* Экранирование строк в одинарных и двойных кавычках */
+static bool word_big ();					/* Большое слово */
 
 int main ()
 {
 	struct test token_tests[] =
 	{
-		{ .name = "white_space", 			.func = white_space },
-		{ .name = "string_quote", 			.func = string_quote },
-//		{ .name = "string_quote_escape", 	.func = string_quote_escape },
+		{ .name = "white_space", 			.func = white_space 			},
+		{ .name = "string_quote", 			.func = string_quote 			},
+		{ .name = "string_quote_escape", 	.func = string_quote_escape 	},
+		{ .name = "word_big", 				.func = word_big 				},
 		NULL
 	};
 
-	if (tests (token_tests) != 0)
+	if (tests ("token.h", token_tests) != 0)
 	{
 		return 1;
 	}
@@ -117,10 +118,42 @@ bool string_quote ()
 	return true;
 }
 
-///**
-// * Экранирование строк в одинарных и двойных кавычках
-// */
-//bool string_quote_escape ()
-//{
-//	return true;
-//}
+/**
+ * Экранирование строк в одинарных и двойных кавычках
+ */
+bool string_quote_escape ()
+{
+	const char * str =
+			"param1 = \"str \\n str \\\" str ' str\";\n"  	/* param1 = "str \n str \" str ' str"; */
+			"param2 = 'str \\n str \" str \\' str';";		/* param1 = 'str \n str " str \' str'; */
+
+	struct token * tokens = token_parse_string (str);
+	if (tokens == NULL)
+	{
+		return false;
+	}
+
+	struct token * t = tokens;
+
+	/* param1 = "str \n str \" str ' str"; */
+	if (strcmp (t->next->next->content, "str \n str \" str ' str") != 0 || t->next->next->type != TOKEN_STRING)
+	{
+		return false;
+	}
+
+	/* param1 = 'str \n str " str \' str'; */
+	if (strcmp (t->next->next->content, "str \\n str \" str ' str") != 0 || t->next->next->type != TOKEN_STRING)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Большое слово
+ */
+bool word_big ()
+{
+	return true;
+}

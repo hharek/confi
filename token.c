@@ -61,6 +61,13 @@ struct token * token_parse_string (const char * str)
 			}
 			break;
 
+			/* Строка в одинарных кавычках. Экранирование */
+			case TOKEN_STRING_QUOTES_SINGLE_ESCAPE:
+			{
+				token_type = token_string_quotes_single_escape (ch, buf, &buf_size, &tokens);
+			}
+			break;
+
 			/* Строка в двойных кавычках */
 			case TOKEN_STRING_QUOTES_DOUBLE:
 			{
@@ -178,6 +185,10 @@ int token_string_quotes_single (char ch, char * buf, unsigned int * buf_size, st
 
 		return TOKEN_BLANK;
 	}
+	else if (ch == '\\')
+	{
+		return TOKEN_STRING_QUOTES_SINGLE_ESCAPE;
+	}
 	else
 	{
 		buf[*buf_size] = ch;
@@ -185,6 +196,28 @@ int token_string_quotes_single (char ch, char * buf, unsigned int * buf_size, st
 
 		return TOKEN_STRING_QUOTES_SINGLE;
 	}
+}
+
+/**
+ * Токен «строка» в одинарных кавычках. Экранирование
+ */
+int token_string_quotes_single_escape (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)
+{
+	if (ch == '\'')
+	{
+		buf[*buf_size] = '\'';
+		(*buf_size)++;
+	}
+	else
+	{
+		buf[*buf_size] = '\\';
+		(*buf_size)++;
+
+		buf[*buf_size] = ch;
+		(*buf_size)++;
+	}
+
+	return TOKEN_STRING_QUOTES_SINGLE;
 }
 
 /**
