@@ -16,7 +16,7 @@
 struct token * token_parse_string (const char * str)
 {
 	static int token_type;
-	static char         buf[TOKEN_BUF_MAX_SIZE + 1];
+	static char         buf[TOKEN_BUF_SIZE + 1];
 	static unsigned int buf_size;
 
 	token_type = TOKEN_BLANK;
@@ -168,6 +168,11 @@ int token_word (char ch, char * buf, unsigned int * buf_size, struct token ** to
 		buf[*buf_size] = ch;
 		(*buf_size)++;
 
+		if ((*buf_size) >= TOKEN_WORD_MAX_SIZE)
+		{
+			return err (CONFI_ERR_TOKEN_WORD_MAX_SIZE, "Превышен размер токена «слово».", NULL);
+		}
+
 		return TOKEN_WORD;
 	}
 }
@@ -193,6 +198,11 @@ int token_string_quotes_single (char ch, char * buf, unsigned int * buf_size, st
 	{
 		buf[*buf_size] = ch;
 		(*buf_size)++;
+
+		if ((*buf_size) >= TOKEN_STRING_MAX_SIZE)
+		{
+			return err (CONFI_ERR_TOKEN_STRING_MAX_SIZE, "Превышен размер токена «строка».", NULL);
+		}
 
 		return TOKEN_STRING_QUOTES_SINGLE;
 	}
@@ -241,6 +251,11 @@ int token_string_quotes_double (char ch, char * buf, unsigned int * buf_size, st
 	{
 		buf[*buf_size] = ch;
 		(*buf_size)++;
+
+		if ((*buf_size) >= TOKEN_STRING_MAX_SIZE)
+		{
+			return err (CONFI_ERR_TOKEN_STRING_MAX_SIZE, "Превышен размер токена «строка».", NULL);
+		}
 
 		return TOKEN_STRING_QUOTES_DOUBLE;
 	}

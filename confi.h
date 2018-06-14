@@ -63,6 +63,8 @@ enum confi_err_code
 	CONFI_ERR_PARAM_NAME_FIRST_BAD_SYMBOL,		/* Недопустимый начальный символ в названии параметра */
 	CONFI_ERR_PARAM_NAME_BAD_SYMBOL,			/* Недопустимые символы в названии параметра */
 	CONFI_ERR_TOKEN_ORDER,						/* Неверный порядок токенов */
+	CONFI_ERR_TOKEN_WORD_MAX_SIZE,				/* Превышен размер токена «слово» */
+	CONFI_ERR_TOKEN_STRING_MAX_SIZE,			/* Превышен размер токена «строка» */
 	CONFI_ERR_VALUE_NOT_INT,					/* Параметр не является числом */
 	CONFI_ERR_VALUE_NOT_DOUBLE,					/* Параметр не является числом с плавающей запятой */
 	CONFI_ERR_VALUE_BIG_STRING,					/* Параметр содержит очень длинную строку */

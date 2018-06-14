@@ -4,6 +4,8 @@
 
 #include "tests.h"
 #include "tests.c"
+#include "../err.h"
+#include "../err.c"
 #include "../token.h"
 #include "../token.c"
 
@@ -11,15 +13,17 @@ static bool white_space ();					/* Проверка на пробельные с
 static bool string_quote ();				/* Строки в одинарных и двойных кавычках */
 static bool string_quote_escape ();			/* Экранирование строк в одинарных и двойных кавычках */
 static bool word_big ();					/* Большое слово */
+static bool string_big ();					/* Большая строка */
 
 int main ()
 {
 	struct test token_tests[] =
 	{
-		{ .name = "white_space", 			.func = white_space 			},
-		{ .name = "string_quote", 			.func = string_quote 			},
-		{ .name = "string_quote_escape", 	.func = string_quote_escape 	},
-		{ .name = "word_big", 				.func = word_big 				},
+//		{ .name = "white_space", 			.func = white_space 			},
+//		{ .name = "string_quote", 			.func = string_quote 			},
+//		{ .name = "string_quote_escape", 	.func = string_quote_escape 	},
+//		{ .name = "word_big", 				.func = word_big 				},
+		{ .name = "string_big", 			.func = string_big 				},
 		NULL
 	};
 
@@ -151,9 +155,36 @@ bool string_quote_escape ()
 }
 
 /**
- * Большое слово
+ * Большое слово. Создаём строку типа aaa.aaa = 1;
  */
 bool word_big ()
 {
+	char word[TOKEN_WORD_MAX_SIZE + 1];
+	memset (word, 'a', TOKEN_WORD_MAX_SIZE + 1);
+	word[TOKEN_WORD_MAX_SIZE + 1] = '\0';
+
+	char str[TOKEN_WORD_MAX_SIZE + 1 + 6] = {'\0'};
+	strcat (str, word);
+	strcat (str, " = 1;");
+
+	struct token * tokens = token_parse_string (str);
+	if (tokens != NULL)
+	{
+		return false;
+	}
+
+	if (err_mess.code != CONFI_ERR_TOKEN_WORD_MAX_SIZE)
+	{
+		return false;
+	}
+
 	return true;
+}
+
+/**
+ * Большая строка
+ */
+bool string_big ()
+{
+
 }
