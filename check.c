@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 
 #include "confi.h"
+#include "check.h"
 #include "err.h"
 #include "err.c"
 
@@ -23,6 +24,12 @@ int confi_file_check (const char * file, FILE ** fp)
 	if (file == NULL || *file == '\0')
 	{
 		return err (CONFI_ERR_FILE_EMPTY, "Файл не указан", NULL);
+	}
+
+	/* Длинное имя файла */
+	if (strlen (file) > 256)
+	{
+		return err (CONFI_ERR_FILE_NAME_MAX_SIZE, "Невозможно открыть файл.", NULL);
 	}
 
 	/* Текушая папка */

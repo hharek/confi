@@ -30,6 +30,7 @@ int tests (char * name, struct test * tests)
 
 		t++;
 	}
+	printf ("\n");
 
 	return 0;
 }

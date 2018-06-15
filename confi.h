@@ -51,6 +51,7 @@ enum confi_err_code
 {
 	CONFI_SUCCESS,								/* Ура */
 	CONFI_ERR_FILE_NOT_OPEN,					/* Невозможно открыть файл */
+	CONFI_ERR_FILE_NAME_MAX_SIZE,				/* Длинное имя файл */
 	CONFI_ERR_FILE_NOT_FILE,					/* Указан не файл */
 	CONFI_ERR_FILE_MAX_SIZE,					/* Большой размер файла */
 	CONFI_ERR_FILE_EMPTY,						/* Для файла указана пустая строка */
