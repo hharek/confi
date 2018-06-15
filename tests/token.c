@@ -19,10 +19,10 @@ int main ()
 {
 	struct test token_tests[] =
 	{
-//		{ .name = "white_space", 			.func = white_space 			},
-//		{ .name = "string_quote", 			.func = string_quote 			},
-//		{ .name = "string_quote_escape", 	.func = string_quote_escape 	},
-//		{ .name = "word_big", 				.func = word_big 				},
+		{ .name = "white_space", 			.func = white_space 			},
+		{ .name = "string_quote", 			.func = string_quote 			},
+		{ .name = "string_quote_escape", 	.func = string_quote_escape 	},
+		{ .name = "word_big", 				.func = word_big 				},
 		{ .name = "string_big", 			.func = string_big 				},
 		NULL
 	};
@@ -43,7 +43,9 @@ bool white_space ()
 	const char * str =
 		"param1 = 1;\n"
 		"param2=2;\n"
-		"     param3\t=\n\t3\n\n\r\n;\n";
+		"     param3\t=\n\t3\n\n\r\n;\n"
+		"param4 = 4;\r\n"
+		"param5 = 5;param6 = 6;";
 
 	struct token * tokens = token_parse_string (str);
 	if (tokens == NULL)
@@ -128,8 +130,8 @@ bool string_quote ()
 bool string_quote_escape ()
 {
 	const char * str =
-			"param1 = \"str \\n str \\\" str ' str\";\n"  	/* param1 = "str \n str \" str ' str"; */
-			"param2 = 'str \\n str \" str \\' str';";		/* param1 = 'str \n str " str \' str'; */
+		"param1 = \"str \\n str \\\" str ' str\";\n"  	/* param1 = "str \n str \" str ' str"; */
+		"param2 = 'str \\n str \" str \\' str';";		/* param1 = 'str \n str " str \' str'; */
 
 	struct token * tokens = token_parse_string (str);
 	if (tokens == NULL)
@@ -145,6 +147,8 @@ bool string_quote_escape ()
 		return false;
 	}
 
+	t = t->next->next->next->next;
+
 	/* param1 = 'str \n str " str \' str'; */
 	if (strcmp (t->next->next->content, "str \\n str \" str ' str") != 0 || t->next->next->type != TOKEN_STRING)
 	{
@@ -155,7 +159,7 @@ bool string_quote_escape ()
 }
 
 /**
- * Большое слово. Создаём строку типа aaa.aaa = 1;
+ * Большое слово. Создаём строку типа aaa...aaa = 1;
  */
 bool word_big ()
 {
@@ -182,9 +186,32 @@ bool word_big ()
 }
 
 /**
- * Большая строка
+ * Большая строка. Создаём строку типа param = "aaa...";
  */
 bool string_big ()
 {
+	char value[TOKEN_STRING_MAX_SIZE + 3];
+	memset (value, 'a', TOKEN_STRING_MAX_SIZE + 1);
+	value[TOKEN_STRING_MAX_SIZE + 1] = '\0';
 
+	char str_single[TOKEN_STRING_MAX_SIZE + 11] = "param = ";
+	char str_double[TOKEN_STRING_MAX_SIZE + 11] = "param = ";
+
+	strcat (str_single, "'");
+	strcat (str_single, value);
+	strcat (str_single, "';");
+
+	strcat (str_double, "\"");
+	strcat (str_double, value);
+	strcat (str_double, "\";");
+
+	if (token_parse_string (str_single) != NULL) 			{ return false; }
+	if (err_mess.code != CONFI_ERR_TOKEN_STRING_MAX_SIZE) 	{ return false; }
+
+	err_mess.code = CONFI_SUCCESS;
+
+	if (token_parse_string (str_double) != NULL)			{ return false; }
+	if (err_mess.code != CONFI_ERR_TOKEN_STRING_MAX_SIZE)	{ return false; }
+
+	return true;
 }

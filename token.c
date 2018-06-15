@@ -81,6 +81,13 @@ struct token * token_parse_string (const char * str)
 				token_type = token_string_quotes_double_escape (ch, buf, &buf_size, &tokens);
 			}
 			break;
+
+			/* Ошибка при парсинге */
+			default:
+			{
+				return NULL;
+			}
+			break;
 		}
 
 		if (ch == '\0')
