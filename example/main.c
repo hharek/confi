@@ -9,6 +9,7 @@ int main()
 	{
 		int param_int1;
 		int param_int2;
+		unsigned int param_uint;
 		double param_double1;
 		double param_double2;
 		int param_min;
@@ -25,6 +26,7 @@ int main()
 	{
 		{ .name = "param_int1",		.type = CONFI_TYPE_INT,		.ptr = &params.param_int1												},
 		{ .name = "param_int2",		.type = CONFI_TYPE_INT, 	.ptr = &params.param_int2												},
+		{ .name = "param_uint",		.type = CONFI_TYPE_UINT, 	.ptr = &params.param_uint												},
 		{ .name = "param_double1",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double1 											},
 		{ .name = "param_double2",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double2,	.require = true							},
 		{ .name = "param_min",		.type = CONFI_TYPE_INT,		.ptr = &params.param_min 												},
@@ -48,6 +50,7 @@ int main()
 
 	printf ("param_int1 = %d\n", params.param_int1);
 	printf ("param_int2 = %d\n", params.param_int2);
+	printf ("param_uint = %u\n", params.param_uint);
 	printf ("param_double1 = %f\n", params.param_double1);
 	printf ("param_double2 = %f\n", params.param_double2);
 	printf ("param_min = %d\n", params.param_min);

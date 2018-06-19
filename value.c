@@ -18,6 +18,9 @@ int value_set (struct confi_param * param)
 		case CONFI_TYPE_INT:
 			return value_set_int (param);
 
+		case CONFI_TYPE_UINT:
+			return value_set_uint (param);
+
 		case CONFI_TYPE_DOUBLE:
 			return  value_set_double (param);
 
@@ -38,13 +41,39 @@ int value_set_int (struct confi_param * param)
 	strtol (param->value, &end, 0);
 	if (*end)
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом со знаком.", param->name);
 	}
 
 	if (param->ptr != NULL)
 	{
 		int value_int = (int)strtol (param->value, &end, 0);
 		*((int *)param->ptr) = value_int;
+	}
+
+	return 0;
+}
+
+/**
+ * Проверить и назначить как число без знаком
+ */
+int value_set_uint (struct confi_param * param)
+{
+	char * end;
+	strtoul (param->value, &end, 0);
+	if (*end)
+	{
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", param->name);
+	}
+
+	if (param->value[0] == '-')
+	{
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", param->name);
+	}
+
+	if (param->ptr != NULL)
+	{
+		unsigned int value_int = (unsigned int)strtoul (param->value, &end, 0);
+		*((unsigned int *)param->ptr) = value_int;
 	}
 
 	return 0;
