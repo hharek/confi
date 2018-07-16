@@ -12,6 +12,7 @@ int main()
 		unsigned int param_uint;
 		double param_double1;
 		double param_double2;
+		double param_double3;
 		int param_min;
 		char * param_string1;
 		char * param_string2;
@@ -29,6 +30,7 @@ int main()
 		{ .name = "param_uint",		.type = CONFI_TYPE_UINT, 	.ptr = &params.param_uint												},
 		{ .name = "param_double1",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double1 											},
 		{ .name = "param_double2",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double2,	.require = true							},
+		{ .name = "param_double3",	.type = CONFI_TYPE_DOUBLE,	.ptr = &params.param_double3											},
 		{ .name = "param_min",		.type = CONFI_TYPE_INT,		.ptr = &params.param_min 												},
 		{ .name = "param_string1",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string1											},
 		{ .name = "param_string2",	.type = CONFI_TYPE_STRING,	.ptr = &params.param_string2 											},
@@ -53,6 +55,7 @@ int main()
 	printf ("param_uint = %u\n", params.param_uint);
 	printf ("param_double1 = %f\n", params.param_double1);
 	printf ("param_double2 = %f\n", params.param_double2);
+	printf ("param_double3 = %f\n", params.param_double3);
 	printf ("param_min = %d\n", params.param_min);
 	printf ("param_string1 = %s\n", params.param_string1);
 	printf ("param_string2 = %s\n", params.param_string2);

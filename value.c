@@ -16,38 +16,38 @@ int value_set (struct confi_param * param)
 	switch (param->type)
 	{
 		case CONFI_TYPE_INT:
-			return value_set_int (param);
+			return value_set_int (param->name, param->value, param->ptr);
 
 		case CONFI_TYPE_UINT:
-			return value_set_uint (param);
+			return value_set_uint (param->name, param->value, param->ptr);
 
 		case CONFI_TYPE_DOUBLE:
-			return  value_set_double (param);
+			return  value_set_double (param->name, param->value, param->ptr);
 
 		case CONFI_TYPE_STRING:
-			return  value_set_string (param);
+			return  value_set_string (param->name, param->value, param->ptr);
 
 		case CONFI_TYPE_BOOLEAN:
-			return  value_set_bool (param);
+			return  value_set_bool (param->name, param->value, param->ptr);
 	}
 }
 
 /**
  * Проверить и назначить как число со знаком
  */
-int value_set_int (struct confi_param * param)
+int value_set_int (const char * name, const char * value, void * ptr)
 {
 	char * end;
-	strtol (param->value, &end, 0);
+	strtol (value, &end, 0);
 	if (*end)
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом со знаком.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом со знаком.", name);
 	}
 
-	if (param->ptr != NULL)
+	if (ptr != NULL)
 	{
-		int value_int = (int)strtol (param->value, &end, 0);
-		*((int *)param->ptr) = value_int;
+		int value_int = (int)strtol (value, &end, 0);
+		*((int *)ptr) = value_int;
 	}
 
 	return 0;
@@ -56,24 +56,24 @@ int value_set_int (struct confi_param * param)
 /**
  * Проверить и назначить как число без знаком
  */
-int value_set_uint (struct confi_param * param)
+int value_set_uint (const char * name, const char * value, void * ptr)
 {
+	if (value[0] == '-' || value[0] == '+')
+	{
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", name);
+	}
+
 	char * end;
-	strtoul (param->value, &end, 0);
+	strtoul (value, &end, 0);
 	if (*end)
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", name);
 	}
 
-	if (param->value[0] == '-')
+	if (ptr != NULL)
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", param->name);
-	}
-
-	if (param->ptr != NULL)
-	{
-		unsigned int value_int = (unsigned int)strtoul (param->value, &end, 0);
-		*((unsigned int *)param->ptr) = value_int;
+		unsigned int value_int = (unsigned int)strtoul (value, &end, 0);
+		*((unsigned int *)ptr) = value_int;
 	}
 
 	return 0;
@@ -82,19 +82,19 @@ int value_set_uint (struct confi_param * param)
 /**
  *  Проверить и назначить как число с плавающей точкой
  */
-int value_set_double (struct confi_param * param)
+int value_set_double (const char * name, const char * value, void * ptr)
 {
 	char * end;
-	strtod (param->value, &end);
+	strtod (value, &end);
 	if (*end)
 	{
-		return err (CONFI_ERR_VALUE_NOT_DOUBLE, "Параметр «%s» не является числом с плавающей запятой.", param->name);
+		return err (CONFI_ERR_VALUE_NOT_DOUBLE, "Параметр «%s» не является числом с плавающей запятой.", name);
 	}
 
-	if (param->ptr != NULL)
+	if (ptr != NULL)
 	{
-		double value_double = strtod (param->value, &end);
-		*((double *) param->ptr) = value_double;
+		double value_double = strtod (value, &end);
+		*((double *) ptr) = value_double;
 	}
 
 	return 0;
@@ -103,16 +103,16 @@ int value_set_double (struct confi_param * param)
 /**
  * Проверить и назначить как строку
  */
-int value_set_string (struct confi_param * param)
+int value_set_string (const char * name, const char * value, void * ptr)
 {
-	if (strlen (param->value) > CONFI_VALUE_STRING_MAX_LENGTH)
+	if (strlen (value) > CONFI_VALUE_STRING_MAX_LENGTH)
 	{
-		return err (CONFI_ERR_VALUE_BIG_STRING, "Параметр «%s» содержит слишком длинную строку.", param->name);
+		return err (CONFI_ERR_VALUE_BIG_STRING, "Параметр «%s» содержит слишком длинную строку.", name);
 	}
 
-	if (param->ptr != NULL)
+	if (ptr != NULL)
 	{
-		*((char **)param->ptr) = strdup (param->value);
+		*((char **)ptr) = strdup (value);
 	}
 
 	return 0;
@@ -121,47 +121,48 @@ int value_set_string (struct confi_param * param)
 /**
  * Проверить и назначить как булёвое значение
  */
-int value_set_bool (struct confi_param * param)
+int value_set_bool (const char * name, const char * value, void * ptr)
 {
 	if
 	(
-		strcmp (param->value, "1") != 0 &&
-		strcmp (param->value, "0") != 0 &&
-		strcmp (param->value, "true") != 0 &&
-		strcmp (param->value, "false") != 0 &&
-		strcmp (param->value, "yes") != 0 &&
-		strcmp (param->value, "no") != 0 &&
-		strcmp (param->value, "on") != 0 &&
-		strcmp (param->value, "off") != 0
+		strcmp (value, "1") != 0 &&
+		strcmp (value, "0") != 0 &&
+		strcmp (value, "true") != 0 &&
+		strcmp (value, "false") != 0 &&
+		strcmp (value, "yes") != 0 &&
+		strcmp (value, "no") != 0 &&
+		strcmp (value, "on") != 0 &&
+		strcmp (value, "off") != 0
 	)
 	{
-		return err (CONFI_ERR_VALUE_NOT_BOOLEAN, "Параметр «%s» не является булёвым значением. Допустимые значения «1, 0, true, false, yes, no, on, off»", param->name);
+		return err (CONFI_ERR_VALUE_NOT_BOOLEAN, "Параметр «%s» не является булёвым значением. Допустимые значения «1, 0, true, false, yes, no, on, off»", name);
 	}
 
-	if (param->ptr != NULL)
+	if (ptr != NULL)
 	{
-		bool value_bool;
+		bool value_bool = false;
+
 		if
 		(
-			strcmp (param->value, "1") == 0 ||
-			strcmp (param->value, "true") == 0 ||
-			strcmp (param->value, "yes") == 0 ||
-			strcmp (param->value, "on") == 0)
+			strcmp (value, "1") == 0 ||
+			strcmp (value, "true") == 0 ||
+			strcmp (value, "yes") == 0 ||
+			strcmp (value, "on") == 0)
 		{
 			value_bool = true;
 		}
 		else if
 		(
-			strcmp (param->value, "0") == 0 ||
-			strcmp (param->value, "false") == 0 ||
-			strcmp (param->value, "no") == 0 ||
-			strcmp (param->value, "off") == 0
+			strcmp (value, "0") == 0 ||
+			strcmp (value, "false") == 0 ||
+			strcmp (value, "no") == 0 ||
+			strcmp (value, "off") == 0
 		)
 		{
 			value_bool = false;
 		}
 
-		*((bool *) param->ptr) = value_bool;
+		*((bool *) ptr) = value_bool;
 	}
 
 	return 0;
