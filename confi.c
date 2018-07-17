@@ -139,13 +139,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 	}
 
 	/* Очищаем массив токенов */
-	t = tokens;
-	while (t != NULL)
-	{
-		void * old = (void *) t;
-		t = t->next;
-		free (old);
-	}
+	token_free (tokens);
 
 	/* Проверяем и назначаем данные */
 	param = params;

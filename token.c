@@ -108,6 +108,20 @@ struct token * token_parse_string (const char * str)
 }
 
 /**
+ * Очистить
+ */
+void token_free (struct token * tokens)
+{
+	struct token * t = tokens;
+	while (t != NULL)
+	{
+		void * old = (void *) t;
+		t = t->next;
+		free (old);
+	}
+}
+
+/**
  * Токен «код»
  */
 int token_blank (char ch, char * buf, unsigned int * buf_size, struct token ** tokens)

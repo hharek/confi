@@ -60,14 +60,14 @@ int value_set_uint (const char * name, const char * value, void * ptr)
 {
 	if (value[0] == '-' || value[0] == '+')
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", name);
+		return err (CONFI_ERR_VALUE_NOT_UINT, "Параметр «%s» не является числом без знака.", name);
 	}
 
 	char * end;
 	strtoul (value, &end, 0);
 	if (*end)
 	{
-		return err (CONFI_ERR_VALUE_NOT_INT, "Параметр «%s» не является числом без знака.", name);
+		return err (CONFI_ERR_VALUE_NOT_UINT, "Параметр «%s» не является числом без знака.", name);
 	}
 
 	if (ptr != NULL)

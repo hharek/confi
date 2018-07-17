@@ -37,6 +37,7 @@ enum
 
 /*** Прототипы функций ***/
 static struct token * token_parse_string (const char * str);
+static void token_free (struct token * token);
 
 static int token_blank (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
 static int token_comment (char ch, char * buf, unsigned int * buf_size, struct token ** tokens);
