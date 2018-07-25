@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
 
 #include "token.h"
 #include "err.h"
@@ -35,59 +33,42 @@ struct token * token_parse_string (const char * str)
 		{
 			/* Код */
 			case TOKEN_BLANK:
-			{
 				token_type = token_blank (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Комментарий */
 			case TOKEN_COMMENT:
-			{
 				token_type = token_comment (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Идентификатор */
 			case TOKEN_WORD:
-			{
 				token_type = token_word (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Строка в одинарных кавычках */
 			case TOKEN_STRING_QUOTES_SINGLE:
-			{
 				token_type = token_string_quotes_single (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Строка в одинарных кавычках. Экранирование */
 			case TOKEN_STRING_QUOTES_SINGLE_ESCAPE:
-			{
 				token_type = token_string_quotes_single_escape (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Строка в двойных кавычках */
 			case TOKEN_STRING_QUOTES_DOUBLE:
-			{
 				token_type = token_string_quotes_double (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Строка в двойных кавычках. Экранирование */
 			case TOKEN_STRING_QUOTES_DOUBLE_ESCAPE:
-			{
 				token_type = token_string_quotes_double_escape (ch, buf, &buf_size, &tokens);
-			}
-			break;
+				break;
 
 			/* Ошибка при парсинге */
 			default:
-			{
 				return NULL;
-			}
-			break;
 		}
 
 		if (ch == '\0')
