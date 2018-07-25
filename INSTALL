@@ -1,0 +1,11 @@
+$ git clone https://github.com/hharek/confi.git .
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ make install
+$ cp include/confi.h my_include_dir
+$ cp cp lib/libconfi.so my_lib_dir
+
+
+
