@@ -110,7 +110,7 @@ int confi_parse_string (const char * str, struct confi_param * params)
 				}
 
 				isset = true;
-				param->value = strdup (t->next->next->content);
+				param->value = t->next->next->content;
 				t->param_isset = true;
 			}
 
@@ -138,9 +138,6 @@ int confi_parse_string (const char * str, struct confi_param * params)
 		t = t->next->next->next->next;
 	}
 
-	/* Очищаем массив токенов */
-	token_free (tokens);
-
 	/* Проверяем и назначаем данные */
 	param = params;
 	while (param->name != NULL)
@@ -155,6 +152,11 @@ int confi_parse_string (const char * str, struct confi_param * params)
 
 		param++;
 	}
+
+	/* Очищаем массив токенов */
+	token_free (tokens);
+
+	return 0;
 }
 
 /**

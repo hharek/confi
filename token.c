@@ -115,8 +115,10 @@ void token_free (struct token * tokens)
 	struct token * t = tokens;
 	while (t != NULL)
 	{
-		void * old = (void *) t;
+		static struct token * old;
+		old = t;
 		t = t->next;
+		free (old->content);
 		free (old);
 	}
 }
