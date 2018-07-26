@@ -43,6 +43,8 @@ int confi (const char * file, struct confi_param * params)
 
 	/* Закрыть файл */
     fclose (fp);
+
+	return 0;
 }
 
 /**

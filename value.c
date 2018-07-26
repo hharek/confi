@@ -30,6 +30,8 @@ int value_set (struct confi_param * param)
 		case CONFI_TYPE_BOOLEAN:
 			return  value_set_bool (param->name, param->value, param->ptr);
 	}
+
+	return 0;
 }
 
 /**
