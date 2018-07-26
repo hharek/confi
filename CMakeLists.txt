@@ -20,5 +20,13 @@ add_library(confi SHARED ${confi_SOURCE_FILES})
 add_subdirectory(example)
 add_subdirectory(tests)
 
-install(TARGETS confi DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib)
-install(FILES confi.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+include(GNUInstallDirs)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        VERSION 1.0
+        PUBLIC_HEADER confi.h
+)
+
+install(TARGETS confi
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
