@@ -1,24 +1,16 @@
-- Установка через cmake
-$ git clone https://github.com/hharek/confi.git .
-$ mkdir build
-$ cd build
-$ cmake ..
+- Сборка через CMake (версии 3.7 и выше)
+$ cmake .
 $ make
-$ cp confi.h libconfi.so /opt/my_app
 
-- Установка через gcc
-$ git clone https://github.com/hharek/confi.git .
+- Сборка через GCC
 $ gcc -c -Wall -Werror -fpic confi.c
 $ gcc -shared -o libconfi.so confi.o
+
+- Установка напрямую в программму
 $ cp confi.h libconfi.so /opt/my_app
 
-- Установка как библиотеки через cmake
-$ git clone https://github.com/hharek/confi.git .
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make && make install
+- Установка в систему (CMake)
+# make install
 
 - Использование
 $ gcc -Wall -o main main.c -lconfi
-
