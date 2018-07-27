@@ -1,10 +1,5 @@
-#pragma once
-
 #include <stdio.h>
 #include <string.h>
-
-#include "confi.h"
-#include "err.h"
 
 /**
  * Назначить сообщение об ошибке

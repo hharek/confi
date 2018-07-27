@@ -1,18 +1,10 @@
-#pragma once
-
 #include <string.h>
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
-
-#include "confi.h"
-#include "check.h"
-#include "err.h"
-#include "err.c"
 
 /**
  * Проверить файл

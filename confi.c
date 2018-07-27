@@ -4,14 +4,14 @@
 #include <stdlib.h>
 
 #include "confi.h"
-#include "err.h"
-#include "err.c"
-#include "check.h"
-#include "check.c"
-#include "token.h"
-#include "token.c"
-#include "value.h"
-#include "value.c"
+#include "inc/err.h"
+#include "inc/err.c"
+#include "inc/check.h"
+#include "inc/check.c"
+#include "inc/token.h"
+#include "inc/token.c"
+#include "inc/value.h"
+#include "inc/value.c"
 
 /**
  * Спарсить файл

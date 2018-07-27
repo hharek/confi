@@ -5,10 +5,11 @@
 
 #include "tests.h"
 #include "tests.c"
-#include "../err.h"
-#include "../err.c"
-#include "../check.h"
-#include "../check.c"
+#include "../confi.h"
+#include "../inc/err.h"
+#include "../inc/err.c"
+#include "../inc/check.h"
+#include "../inc/check.c"
 
 static bool empty_string ();			/* Указана пустая строка или NULL */
 static bool random_string ();			/* Случайная строка */

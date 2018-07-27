@@ -4,10 +4,11 @@
 
 #include "tests.h"
 #include "tests.c"
-#include "../err.h"
-#include "../err.c"
-#include "../token.h"
-#include "../token.c"
+#include "../confi.h"
+#include "../inc/err.h"
+#include "../inc/err.c"
+#include "../inc/token.h"
+#include "../inc/token.c"
 
 static bool white_space ();					/* Проверка на пробельные символы */
 static bool string_quote ();				/* Строки в одинарных и двойных кавычках */

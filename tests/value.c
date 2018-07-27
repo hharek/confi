@@ -5,10 +5,11 @@
 
 #include "tests.h"
 #include "tests.c"
-#include "../err.h"
-#include "../err.c"
-#include "../value.h"
-#include "../value.c"
+#include "../confi.h"
+#include "../inc/err.h"
+#include "../inc/err.c"
+#include "../inc/value.h"
+#include "../inc/value.c"
 
 static bool set_int ();
 static bool set_uint ();

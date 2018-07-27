@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "confi.h"
-#include "value.h"
-#include "err.h"
-#include "err.c"
-
 /**
  * Проверить строку на соответствие типу и назначить по адресу
  */

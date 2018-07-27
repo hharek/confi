@@ -1,12 +1,6 @@
-#pragma once
-
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-
-#include "token.h"
-#include "err.h"
-#include "err.c"
 
 /**
  * Разбираем файл на токены

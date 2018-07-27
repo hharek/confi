@@ -3,29 +3,23 @@ project(confi)
 
 set(CMAKE_C_STANDARD 11)
 
+# Library confi
 set(confi_SOURCE_FILES
         confi.h
-        confi.c
-        err.h
-        err.c
-        check.h
-        check.c
-        token.h
-        token.c
-        value.h
-        value.c)
+        confi.c)
 
 add_library(confi SHARED ${confi_SOURCE_FILES})
 
+# Examples and tests
 add_subdirectory(example)
 add_subdirectory(tests)
 
-
+# For command: make install
 include(GNUInstallDirs)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
         VERSION 1.0
-        PUBLIC_HEADER confi.h
-)
+        PUBLIC_HEADER confi.h)
 
 install(TARGETS confi
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
