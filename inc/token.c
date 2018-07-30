@@ -335,7 +335,7 @@ int token_semicolon (struct token ** tokens)
  */
 void token_push (int type, char * content, struct token ** tokens)
 {
-	struct token * next = malloc (sizeof (struct token));
+	struct token * next = (struct token *)malloc (sizeof (struct token));
 	next->type = type;
 	next->content = content;
 	next->next = NULL;
