@@ -11,7 +11,7 @@ set(confi_SOURCE_FILES
 add_library(confi SHARED ${confi_SOURCE_FILES})
 
 # Examples and tests
-add_subdirectory(example)
+add_subdirectory(examples)
 add_subdirectory(tests)
 
 # For command: make install
