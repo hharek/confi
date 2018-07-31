@@ -73,6 +73,7 @@ int main()
 		{ .name = "param_repeat",	.type = CONFI_TYPE_INT,		.ptr = &params.param_repeat						},
 		{ .name = "param_require",	.type = CONFI_TYPE_INT,		.ptr = &params.param_require,	.require = true	},
 
+		/* Required NULL */
 		NULL
 	};
 
