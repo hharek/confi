@@ -4,7 +4,7 @@ A simple library for parsing the configuration file, with the specified paramete
 
 -------------------------------------------------------------------------------------
 
-Простая библиотека для парсинга конфигурационного файла, с указанными параметрамми.
+Простая библиотека для парсинга конфигурационного файла, с указанными параметрами.
 
 ## Пример
 ```
@@ -65,8 +65,9 @@ port = 3334
 ssl = 0
 ```
 
-## Установка
-- [INSTALL](https://github.com/hharek/confi/wiki/INSTALL)
+## Документация
+- [Установка](https://github.com/hharek/confi/wiki/INSTALL)
+- [Использование](https://github.com/hharek/confi/wiki/Использование)
 
 ## Другое
 - [CHANGELOG](https://github.com/hharek/confi/wiki/CHANGELOG)
