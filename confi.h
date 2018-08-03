@@ -30,7 +30,7 @@ struct confi_param
 {
 	const char * name;
 	enum confi_type type;
-	char * value;
+	const char * value;
 	bool require;
 	void * ptr;
 };

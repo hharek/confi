@@ -3,7 +3,7 @@
 
 #include "confi.h"
 
-int main()
+int main ()
 {
 	struct
 	{
